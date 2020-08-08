@@ -7,160 +7,58 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Geep.DataAccess.Context;
 using Geep.Models.Core;
+using Geep.ViewModels.CoreVm;
+using Geep.DomainLayer.GeneralAbstractions;
 
 namespace Geep.Web.Controllers
 {
     public class BeneficiariesController : Controller
     {
-        private readonly GeepDbContext _context;
+        private ICrudInteger<BeneficiaryVm> _repo;
 
-        public BeneficiariesController(GeepDbContext context)
+        public BeneficiariesController(ICrudInteger<BeneficiaryVm> repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
-        // GET: Beneficiaries
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var geepDbContext = _context.Beneficiaries.Include(b => b.ClusterLocation).Include(b => b.association);
-            return View(await geepDbContext.ToListAsync());
-        }
-
-        // GET: Beneficiaries/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var beneficiary = await _context.Beneficiaries
-                .Include(b => b.ClusterLocation)
-                .Include(b => b.association)
-                .FirstOrDefaultAsync(m => m.BeneficiaryId == id);
-            if (beneficiary == null)
-            {
-                return NotFound();
-            }
-
-            return View(beneficiary);
-        }
-
-        // GET: Beneficiaries/Create
-        public IActionResult Create()
-        {
-            ViewData["ClusterLocationId"] = new SelectList(_context.ClusterLocations, "ClusterLocationId", "ClusterLocationId");
-            ViewData["AssociationId"] = new SelectList(_context.Associations, "AssociationId", "AssociationId");
             return View();
         }
 
-        // POST: Beneficiaries/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        public async Task<IActionResult> GetIndex()
+        {
+            var data = await _repo.GetAll();
+            return Json(new { data });
+        }
+
+        public async Task<IActionResult> Save(int id)
+        {
+            var model = await _repo.GetById(id);
+
+            return PartialView(model);
+        }
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BeneficiaryId,ReferenceId,ClusterLocationId,TreadeTypeId,TradeSubType,AgentId,CurrentProgramId,AssociationId,FirstName,LastName,MiddleName,Gender,DateOfBirth,PhoneNumber,BVN,HomeAddress,CurrendBankId,AccountNumber,GPS,FacialPicture,Picture,SmileIdZip,Disability,SmileReference,DateEnumerated,NextOfKinAddress,NextOfKinPhone,GuarantorFirstName,GuarantoLastName,GuarantorFirstPhone,IdCardNumber,NextOfKinName,GeopoliticalId,CreatedBy,DateCreated,DateUpdated,UpdatedBy")] Beneficiary beneficiary)
+        public async Task<IActionResult> Save(BeneficiaryVm vm)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(beneficiary);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var response = await _repo.AddOrUpdate(vm);
+                return Json(new { status = response.Status, message = response.Message });
             }
-            ViewData["ClusterLocationId"] = new SelectList(_context.ClusterLocations, "ClusterLocationId", "ClusterLocationId", beneficiary.ClusterLocationId);
-            ViewData["AssociationId"] = new SelectList(_context.Associations, "AssociationId", "AssociationId", beneficiary.AssociationId);
-            return View(beneficiary);
+            string errorMessages = string.Join("; ", ModelState.Values
+                                                    .SelectMany(x => x.Errors)
+                                                    .Select(x => x.ErrorMessage));
+            return Json(new { status = false, message = $"Oops.. {errorMessages}" });
         }
 
-        // GET: Beneficiaries/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var beneficiary = await _context.Beneficiaries.FindAsync(id);
-            if (beneficiary == null)
-            {
-                return NotFound();
-            }
-            ViewData["ClusterLocationId"] = new SelectList(_context.ClusterLocations, "ClusterLocationId", "ClusterLocationId", beneficiary.ClusterLocationId);
-            ViewData["AssociationId"] = new SelectList(_context.Associations, "AssociationId", "AssociationId", beneficiary.AssociationId);
-            return View(beneficiary);
-        }
-
-        // POST: Beneficiaries/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BeneficiaryId,ReferenceId,ClusterLocationId,TreadeTypeId,TradeSubType,AgentId,CurrentProgramId,AssociationId,FirstName,LastName,MiddleName,Gender,DateOfBirth,PhoneNumber,BVN,HomeAddress,CurrendBankId,AccountNumber,GPS,FacialPicture,Picture,SmileIdZip,Disability,SmileReference,DateEnumerated,NextOfKinAddress,NextOfKinPhone,GuarantorFirstName,GuarantoLastName,GuarantorFirstPhone,IdCardNumber,NextOfKinName,GeopoliticalId,CreatedBy,DateCreated,DateUpdated,UpdatedBy")] Beneficiary beneficiary)
-        {
-            if (id != beneficiary.BeneficiaryId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(beneficiary);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BeneficiaryExists(beneficiary.BeneficiaryId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ClusterLocationId"] = new SelectList(_context.ClusterLocations, "ClusterLocationId", "ClusterLocationId", beneficiary.ClusterLocationId);
-            ViewData["AssociationId"] = new SelectList(_context.Associations, "AssociationId", "AssociationId", beneficiary.AssociationId);
-            return View(beneficiary);
-        }
-
-        // GET: Beneficiaries/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var beneficiary = await _context.Beneficiaries
-                .Include(b => b.ClusterLocation)
-                .Include(b => b.association)
-                .FirstOrDefaultAsync(m => m.BeneficiaryId == id);
-            if (beneficiary == null)
-            {
-                return NotFound();
-            }
-
-            return View(beneficiary);
-        }
-
-        // POST: Beneficiaries/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var beneficiary = await _context.Beneficiaries.FindAsync(id);
-            _context.Beneficiaries.Remove(beneficiary);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool BeneficiaryExists(int id)
-        {
-            return _context.Beneficiaries.Any(e => e.BeneficiaryId == id);
+            var response = await _repo.Delete(id);
+            return Json(new { status = response.Status, message = response.Message });
         }
     }
 }

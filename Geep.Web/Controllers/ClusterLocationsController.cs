@@ -7,154 +7,58 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Geep.DataAccess.Context;
 using Geep.Models.Core;
+using Geep.ViewModels.CoreVm;
+using Geep.DomainLayer.GeneralAbstractions;
 
 namespace Geep.Web.Controllers
 {
     public class ClusterLocationsController : Controller
     {
-        private readonly GeepDbContext _context;
+        private ICrudInteger<ClusterLocationVm> _repo;
 
-        public ClusterLocationsController(GeepDbContext context)
+        public ClusterLocationsController(ICrudInteger<ClusterLocationVm> repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
-        // GET: ClusterLocations
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var geepDbContext = _context.ClusterLocations.Include(c => c.State);
-            return View(await geepDbContext.ToListAsync());
-        }
-
-        // GET: ClusterLocations/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var clusterLocation = await _context.ClusterLocations
-                .Include(c => c.State)
-                .FirstOrDefaultAsync(m => m.ClusterLocationId == id);
-            if (clusterLocation == null)
-            {
-                return NotFound();
-            }
-
-            return View(clusterLocation);
-        }
-
-        // GET: ClusterLocations/Create
-        public IActionResult Create()
-        {
-            ViewData["StateId"] = new SelectList(_context.States, "StateId", "StateId");
             return View();
         }
 
-        // POST: ClusterLocations/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        public async Task<IActionResult> GetIndex()
+        {
+            var data = await _repo.GetAll();
+            return Json(new { data });
+        }
+
+        public async Task<IActionResult> Save(int id)
+        {
+            var model = await _repo.GetById(id);
+
+            return PartialView(model);
+        }
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClusterLocationId,StateId,Name,ReferenceId,CreatedBy,DateCreated,DateUpdated,UpdatedBy")] ClusterLocation clusterLocation)
+        public async Task<IActionResult> Save(ClusterLocationVm vm)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(clusterLocation);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var response = await _repo.AddOrUpdate(vm);
+                return Json(new { status = response.Status, message = response.Message });
             }
-            ViewData["StateId"] = new SelectList(_context.States, "StateId", "StateId", clusterLocation.StateId);
-            return View(clusterLocation);
+            string errorMessages = string.Join("; ", ModelState.Values
+                                                    .SelectMany(x => x.Errors)
+                                                    .Select(x => x.ErrorMessage));
+            return Json(new { status = false, message = $"Oops.. {errorMessages}" });
         }
 
-        // GET: ClusterLocations/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var clusterLocation = await _context.ClusterLocations.FindAsync(id);
-            if (clusterLocation == null)
-            {
-                return NotFound();
-            }
-            ViewData["StateId"] = new SelectList(_context.States, "StateId", "StateId", clusterLocation.StateId);
-            return View(clusterLocation);
-        }
-
-        // POST: ClusterLocations/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ClusterLocationId,StateId,Name,ReferenceId,CreatedBy,DateCreated,DateUpdated,UpdatedBy")] ClusterLocation clusterLocation)
-        {
-            if (id != clusterLocation.ClusterLocationId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(clusterLocation);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ClusterLocationExists(clusterLocation.ClusterLocationId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["StateId"] = new SelectList(_context.States, "StateId", "StateId", clusterLocation.StateId);
-            return View(clusterLocation);
-        }
-
-        // GET: ClusterLocations/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var clusterLocation = await _context.ClusterLocations
-                .Include(c => c.State)
-                .FirstOrDefaultAsync(m => m.ClusterLocationId == id);
-            if (clusterLocation == null)
-            {
-                return NotFound();
-            }
-
-            return View(clusterLocation);
-        }
-
-        // POST: ClusterLocations/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var clusterLocation = await _context.ClusterLocations.FindAsync(id);
-            _context.ClusterLocations.Remove(clusterLocation);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ClusterLocationExists(int id)
-        {
-            return _context.ClusterLocations.Any(e => e.ClusterLocationId == id);
+            var response = await _repo.Delete(id);
+            return Json(new { status = response.Status, message = response.Message });
         }
     }
 }

@@ -7,147 +7,58 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Geep.DataAccess.Context;
 using Geep.Models.Core;
+using Geep.DomainLayer.GeneralAbstractions;
+using Geep.ViewModels.CoreVm;
 
 namespace Geep.Web.Controllers
 {
     public class StatesController : Controller
     {
-        private readonly GeepDbContext _context;
+        private ICrudInteger<StateVm> _repo;
 
-        public StatesController(GeepDbContext context)
+        public StatesController(ICrudInteger<StateVm> repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
-        // GET: States
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.States.ToListAsync());
-        }
-
-        // GET: States/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var state = await _context.States
-                .FirstOrDefaultAsync(m => m.StateId == id);
-            if (state == null)
-            {
-                return NotFound();
-            }
-
-            return View(state);
-        }
-
-        // GET: States/Create
-        public IActionResult Create()
+        public IActionResult Index()
         {
             return View();
         }
 
-        // POST: States/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        public async Task<IActionResult> GetIndex()
+        {
+            var data = await _repo.GetAll();
+            return Json(new { data });
+        }
+
+        public async Task<IActionResult> Save(int id)
+        {
+            var model = await _repo.GetById(id);
+
+            return PartialView(model);
+        }
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("StateId,StateName,ReferenceId,CreatedBy,DateCreated,DateUpdated,UpdatedBy")] State state)
+        public async Task<IActionResult> Save(StateVm vm)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(state);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var response = await _repo.AddOrUpdate(vm);
+                return Json(new { status = response.Status, message = response.Message });
             }
-            return View(state);
+            string errorMessages = string.Join("; ", ModelState.Values
+                                                    .SelectMany(x => x.Errors)
+                                                    .Select(x => x.ErrorMessage));
+            return Json(new { status = false, message = $"Oops.. {errorMessages}" });
         }
 
-        // GET: States/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var state = await _context.States.FindAsync(id);
-            if (state == null)
-            {
-                return NotFound();
-            }
-            return View(state);
-        }
-
-        // POST: States/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("StateId,StateName,ReferenceId,CreatedBy,DateCreated,DateUpdated,UpdatedBy")] State state)
-        {
-            if (id != state.StateId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(state);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!StateExists(state.StateId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(state);
-        }
-
-        // GET: States/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var state = await _context.States
-                .FirstOrDefaultAsync(m => m.StateId == id);
-            if (state == null)
-            {
-                return NotFound();
-            }
-
-            return View(state);
-        }
-
-        // POST: States/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var state = await _context.States.FindAsync(id);
-            _context.States.Remove(state);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool StateExists(int id)
-        {
-            return _context.States.Any(e => e.StateId == id);
+            var response = await _repo.Delete(id);
+            return Json(new { status = response.Status, message = response.Message });
         }
     }
 }

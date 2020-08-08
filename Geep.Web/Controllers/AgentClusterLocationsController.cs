@@ -7,154 +7,58 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Geep.DataAccess.Context;
 using Geep.Models.Core;
+using Geep.ViewModels.CoreVm;
+using Geep.DomainLayer.GeneralAbstractions;
 
 namespace Geep.Web.Controllers
 {
     public class AgentClusterLocationsController : Controller
     {
-        private readonly GeepDbContext _context;
+        private ICrudInteger<AgentClusterLocationVm> _repo;
 
-        public AgentClusterLocationsController(GeepDbContext context)
+        public AgentClusterLocationsController(ICrudInteger<AgentClusterLocationVm> repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
-        // GET: AgentClusterLocations
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var geepDbContext = _context.AgentClusterLocations.Include(a => a.ClusterLocation);
-            return View(await geepDbContext.ToListAsync());
-        }
-
-        // GET: AgentClusterLocations/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var agentClusterLocation = await _context.AgentClusterLocations
-                .Include(a => a.ClusterLocation)
-                .FirstOrDefaultAsync(m => m.AgentClusterLocationId == id);
-            if (agentClusterLocation == null)
-            {
-                return NotFound();
-            }
-
-            return View(agentClusterLocation);
-        }
-
-        // GET: AgentClusterLocations/Create
-        public IActionResult Create()
-        {
-            ViewData["ClusterLocationId"] = new SelectList(_context.ClusterLocations, "ClusterLocationId", "ClusterLocationId");
             return View();
         }
 
-        // POST: AgentClusterLocations/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        public async Task<IActionResult> GetIndex()
+        {
+            var data = await _repo.GetAll();
+            return Json(new { data });
+        }
+
+        public async Task<IActionResult> Save(int id)
+        {
+            var model = await _repo.GetById(id);
+
+            return PartialView(model);
+        }
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AgentClusterLocationId,AgentId,ClusterLocationId,CreatedBy,DateCreated,DateUpdated,UpdatedBy")] AgentClusterLocation agentClusterLocation)
+        public async Task<IActionResult> Save(AgentClusterLocationVm vm)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(agentClusterLocation);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var response = await _repo.AddOrUpdate(vm);
+                return Json(new { status = response.Status, message = response.Message });
             }
-            ViewData["ClusterLocationId"] = new SelectList(_context.ClusterLocations, "ClusterLocationId", "ClusterLocationId", agentClusterLocation.ClusterLocationId);
-            return View(agentClusterLocation);
+            string errorMessages = string.Join("; ", ModelState.Values
+                                                    .SelectMany(x => x.Errors)
+                                                    .Select(x => x.ErrorMessage));
+            return Json(new { status = false, message = $"Oops.. {errorMessages}" });
         }
 
-        // GET: AgentClusterLocations/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var agentClusterLocation = await _context.AgentClusterLocations.FindAsync(id);
-            if (agentClusterLocation == null)
-            {
-                return NotFound();
-            }
-            ViewData["ClusterLocationId"] = new SelectList(_context.ClusterLocations, "ClusterLocationId", "ClusterLocationId", agentClusterLocation.ClusterLocationId);
-            return View(agentClusterLocation);
-        }
-
-        // POST: AgentClusterLocations/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AgentClusterLocationId,AgentId,ClusterLocationId,CreatedBy,DateCreated,DateUpdated,UpdatedBy")] AgentClusterLocation agentClusterLocation)
-        {
-            if (id != agentClusterLocation.AgentClusterLocationId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(agentClusterLocation);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AgentClusterLocationExists(agentClusterLocation.AgentClusterLocationId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ClusterLocationId"] = new SelectList(_context.ClusterLocations, "ClusterLocationId", "ClusterLocationId", agentClusterLocation.ClusterLocationId);
-            return View(agentClusterLocation);
-        }
-
-        // GET: AgentClusterLocations/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var agentClusterLocation = await _context.AgentClusterLocations
-                .Include(a => a.ClusterLocation)
-                .FirstOrDefaultAsync(m => m.AgentClusterLocationId == id);
-            if (agentClusterLocation == null)
-            {
-                return NotFound();
-            }
-
-            return View(agentClusterLocation);
-        }
-
-        // POST: AgentClusterLocations/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var agentClusterLocation = await _context.AgentClusterLocations.FindAsync(id);
-            _context.AgentClusterLocations.Remove(agentClusterLocation);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool AgentClusterLocationExists(int id)
-        {
-            return _context.AgentClusterLocations.Any(e => e.AgentClusterLocationId == id);
+            var response = await _repo.Delete(id);
+            return Json(new { status = response.Status, message = response.Message });
         }
     }
 }
