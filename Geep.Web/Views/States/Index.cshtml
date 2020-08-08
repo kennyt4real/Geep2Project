@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Geep.Models.Core.State>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.StateName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReferenceId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateCreated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateUpdated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdatedBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.StateName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReferenceId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateCreated)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateUpdated)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedBy)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.StateId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.StateId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.StateId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

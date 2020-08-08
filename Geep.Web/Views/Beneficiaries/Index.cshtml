@@ -1,0 +1,245 @@
+﻿@model IEnumerable<Geep.Models.Core.Beneficiary>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ReferenceId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TreadeTypeId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TradeSubType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AgentId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CurrentProgramId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MiddleName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Gender)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateOfBirth)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PhoneNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BVN)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HomeAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CurrendBankId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccountNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GPS)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FacialPicture)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Picture)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SmileIdZip)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Disability)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SmileReference)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateEnumerated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NextOfKinAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NextOfKinPhone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GuarantorFirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GuarantoLastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GuarantorFirstPhone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdCardNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NextOfKinName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GeopoliticalId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.association)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ClusterLocation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateCreated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateUpdated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdatedBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReferenceId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TreadeTypeId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TradeSubType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AgentId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CurrentProgramId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MiddleName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Gender)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateOfBirth)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PhoneNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BVN)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HomeAddress)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CurrendBankId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccountNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GPS)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FacialPicture)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Picture)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SmileIdZip)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Disability)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SmileReference)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateEnumerated)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NextOfKinAddress)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NextOfKinPhone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GuarantorFirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GuarantoLastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GuarantorFirstPhone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdCardNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NextOfKinName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GeopoliticalId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.association.AssociationId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ClusterLocation.ClusterLocationId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateCreated)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateUpdated)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedBy)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.BeneficiaryId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.BeneficiaryId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.BeneficiaryId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
