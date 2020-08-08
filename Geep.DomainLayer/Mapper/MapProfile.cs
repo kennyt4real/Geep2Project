@@ -17,25 +17,43 @@ namespace Geep.DomainLayer.Mapper
             CreateMap<Agent, AgentVm>().ReverseMap();
 
 
-            CreateMap<Beneficiary, BeneficiaryVm>().ReverseMap();
+            CreateMap<BeneficiaryVm, Beneficiary>();
+            CreateMap<Beneficiary, BeneficiaryVm>()
+                    .ForMember(x => x.AgentName, o => o.MapFrom(source => source.Agent.AgentFullName))
+                    .ForMember(x=>x.AgentRefId, o=>o.MapFrom(source=>source.Agent.ReferenceId));
 
 
-            CreateMap<AgentClusterLocation, AgentClusterLocationVm>().ReverseMap();
+            CreateMap<AgentClusterLocationVm, AgentClusterLocation>();
+            CreateMap<AgentClusterLocation, AgentClusterLocationVm>()
+                .ForMember(x => x.AgentName, o => o.MapFrom(source => source.Agent.AgentFullName))
+                .ForMember(x => x.AgentRefId, o => o.MapFrom(source => source.Agent.ReferenceId))
+                .ForMember(x => x.ClusterName, o => o.MapFrom(source => source.ClusterLocation.Name))
+                .ForMember(x => x.ClusterStateName, o => o.MapFrom(source => source.ClusterLocation.State.StateName));
 
 
-            CreateMap<State, StateVm>().ReverseMap();
+            CreateMap<State, StateVm>();
 
 
-            CreateMap<LocalGovernmentArea, LocalGovernmentAreaVm>().ReverseMap();
+            CreateMap<LocalGovernmentAreaVm, LocalGovernmentArea>();
+            CreateMap<LocalGovernmentArea, LocalGovernmentAreaVm>()
+                .ForMember(x => x.StateName, o => o.MapFrom(source => source.State.StateName));
 
 
-            CreateMap<Association, AssociationVm>().ReverseMap();
+            CreateMap<AssociationVm, Association>();
+            CreateMap<Association, AssociationVm>()
+                .ForMember(x => x.AssociationState, o => o.MapFrom(source => source.LocalGovernmentArea.State.StateName))
+                .ForMember(x => x.AssociationLga, o => o.MapFrom(source => source.LocalGovernmentArea.LgaName));
 
 
-            CreateMap<AssociationBeneficiary, AssociationBeneficiaryVm>().ReverseMap();
+            CreateMap<AssociationBeneficiaryVm, AssociationBeneficiary>();
+            CreateMap<AssociationBeneficiary, AssociationBeneficiaryVm>()
+                .ForMember(x => x.BeneficiaryFullName, o => o.MapFrom(x => x.Beneficiary.BeneficiaryFullName))
+                .ForMember(x => x.AssociationName, o => o.MapFrom(x => x.Association.AssociationName));
 
 
-            CreateMap<ClusterLocation, ClusterLocationVm>().ReverseMap();
+            CreateMap<ClusterLocationVm, ClusterLocationVm>();
+            CreateMap<ClusterLocation, ClusterLocationVm>()
+                .ForMember(x => x.StateName, o => o.MapFrom(source => source.State.StateName));
         }
     }
 }

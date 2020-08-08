@@ -23,12 +23,12 @@ namespace Geep.DataAccess.CommandQuery
 
         public async Task<List<ClusterLocationVm>> GetAll()
         {
-            return _mapper.Map<List<ClusterLocationVm>>(await _repo.GetAll());
+            return _mapper.Map<List<ClusterLocationVm>>(await _repo.GetAll($"{nameof(State)}"));
         }
 
         public async Task<ClusterLocationVm> GetById(int id)
         {
-            return _mapper.Map<ClusterLocationVm>(await _repo.GetById(id));
+            return _mapper.Map<ClusterLocationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x=>x.ClusterLocationId.Equals(id),$"{nameof(State)}"));
         }
         public async Task<ResponseVm> AddOrUpdate(ClusterLocationVm vm)
         {

@@ -21,12 +21,13 @@ namespace Geep.DataAccess.CommandQuery
 
         public async Task<List<AssociationBeneficiaryVm>> GetAll()
         {
-            return _mapper.Map<List<AssociationBeneficiaryVm>>(await _repo.GetAll());
+            return _mapper.Map<List<AssociationBeneficiaryVm>>(await _repo.GetAll($"{nameof(Beneficiary)},{nameof(Association)}"));
         }
 
         public async Task<AssociationBeneficiaryVm> GetById(int id)
         {
-            return _mapper.Map<AssociationBeneficiaryVm>(await _repo.GetById(id));
+            return _mapper.Map<AssociationBeneficiaryVm>(await _repo.GetFirstOrDeafultWithNoTracking(x=>x.AssociationBeneficiaryId.Equals(id),
+                                                                             $"{nameof(Beneficiary)},{nameof(Association)}"));
         }
         public async Task<ResponseVm> AddOrUpdate(AssociationBeneficiaryVm vm)
         {

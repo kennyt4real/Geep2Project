@@ -9,5 +9,9 @@ namespace Geep.ViewModels.CoreVm
         public int AgentClusterLocationId { get; set; }
         public int AgentId { get; set; }
         public int ClusterLocationId { get; set; }
+        public string AgentName { get; set; }
+        public string AgentRefId { get; set; }
+        public string ClusterName { get; set; }
+        public string ClusterStateName { get; set; }
     }
 }

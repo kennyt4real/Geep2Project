@@ -19,6 +19,7 @@ namespace Geep.Models.Core
         public string PhoneNumber { get; set; }
         public int LocalGovtRefId { get; set; }
         public string HomeAddress { get; set; }
+        public string AgentFullName => LastName + " " + FirstName;
         public ICollection<ClusterLocation> ClusterLocations { get; set; }
     }
 }

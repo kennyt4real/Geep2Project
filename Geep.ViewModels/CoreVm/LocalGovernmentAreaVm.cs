@@ -10,5 +10,6 @@ namespace Geep.ViewModels.CoreVm
         public int StateId { get; set; }
         public string LgaName { get; set; }
         public int ReferenceId { get; set; }
+        public string StateName { get; set; }
     }
 }

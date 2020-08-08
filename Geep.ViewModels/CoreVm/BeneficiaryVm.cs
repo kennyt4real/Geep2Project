@@ -41,5 +41,7 @@ namespace Geep.ViewModels.CoreVm
         public string IdCardNumber { get; set; }
         public string NextOfKinName { get; set; }
         public string GeopoliticalId { get; set; }
+        public string AgentName { get; set; }
+        public string AgentRefId { get; set; }
     }
 }

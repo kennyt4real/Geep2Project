@@ -9,5 +9,7 @@ namespace Geep.ViewModels.CoreVm
         public int AssociationBeneficiaryId { get; set; }
         public int AssociationId { get; set; }
         public int BeneficiaryId { get; set; }
+        public string BeneficiaryFullName { get; set; }
+        public string AssociationName { get; set; }
     }
 }

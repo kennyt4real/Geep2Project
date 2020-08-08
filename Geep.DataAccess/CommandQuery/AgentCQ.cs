@@ -28,7 +28,7 @@ namespace Geep.DataAccess.CommandQuery
 
         public async Task<AgentVm> GetById(int id)
         {
-            return _mapper.Map<AgentVm>(await _repo.GetById(id));
+            return _mapper.Map<AgentVm>(await _repo.GetFirstOrDeafultWithNoTracking(x=>x.AgentId.Equals(id),""));
         }
         public async  Task<ResponseVm> AddOrUpdate(AgentVm vm)
         {

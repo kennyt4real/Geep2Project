@@ -42,6 +42,7 @@ namespace Geep.Models.Core
         public string IdCardNumber { get; set; }
         public string NextOfKinName { get; set; }
         public string GeopoliticalId { get; set; }
+        public string BeneficiaryFullName => LastName + " " + FirstName;
         public Agent Agent { get; set; }
         public Association association { get; set; }
         public ClusterLocation ClusterLocation { get; set; }

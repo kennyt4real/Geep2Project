@@ -21,12 +21,13 @@ namespace Geep.DataAccess.CommandQuery
 
         public async Task<List<LocalGovernmentAreaVm>> GetAll()
         {
-            return _mapper.Map<List<LocalGovernmentAreaVm>>(await _repo.GetAll());
+            return _mapper.Map<List<LocalGovernmentAreaVm>>(await _repo.GetAll($"{nameof(State)}"));
         }
 
         public async Task<LocalGovernmentAreaVm> GetById(int id)
         {
-            return _mapper.Map<LocalGovernmentAreaVm>(await _repo.GetById(id));
+            return _mapper.Map<LocalGovernmentAreaVm>(await _repo.GetFirstOrDeafultWithNoTracking(x=>x.LocalGovernmentAreaId.Equals(id),
+                                        $"{nameof(State)}"));
         }
         public async Task<ResponseVm> AddOrUpdate(LocalGovernmentAreaVm vm)
         {

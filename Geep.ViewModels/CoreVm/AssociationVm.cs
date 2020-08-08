@@ -17,5 +17,8 @@ namespace Geep.ViewModels.CoreVm
         public string AccreditationStstud { get; set; }
         public string GroupPhoneNumber { get; set; }
         public string GroupEmail { get; set; }
+        public string AssociationLga { get; set; }
+        public string AssociationState { get; set; }
+         
     }
 }
