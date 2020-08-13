@@ -15,14 +15,18 @@ namespace Geep.Web.Controllers
     public class ClusterLocationsController : Controller
     {
         private ICrudInteger<ClusterLocationVm> _repo;
+        private readonly ICrudInteger<StateVm> _stateQuery;
 
-        public ClusterLocationsController(ICrudInteger<ClusterLocationVm> repo)
+        public ClusterLocationsController(ICrudInteger<ClusterLocationVm> repo, ICrudInteger<StateVm> stateQuery)
         {
             _repo = repo;
+            _stateQuery = stateQuery;
         }
 
-        public IActionResult Index()
+        public async  Task<IActionResult> Index()
         {
+            ViewData["StateId"] = new SelectList(await _stateQuery.GetAll(), "StateId", "StateName");
+
             return View();
         }
 
@@ -35,6 +39,7 @@ namespace Geep.Web.Controllers
         public async Task<IActionResult> Save(int id)
         {
             var model = await _repo.GetById(id);
+            ViewData["StateId"] = new SelectList(await _stateQuery.GetAll(), "StateId", "StateName", model?.StateId);
 
             return PartialView(model);
         }

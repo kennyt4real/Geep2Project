@@ -9,6 +9,7 @@ namespace Geep.Models.Core
         public int AgentClusterLocationId { get; set; }
         public int AgentId { get; set; }
         public int ClusterLocationId { get; set; }
+
         public Agent Agent { get; set; }
         public ClusterLocation ClusterLocation { get; set; }
 

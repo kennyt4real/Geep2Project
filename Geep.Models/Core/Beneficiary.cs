@@ -19,7 +19,7 @@ namespace Geep.Models.Core
         public string LastName { get; set; }
         public string MiddleName { get; set; }
         public string Gender { get; set; }
-        public string DateOfBirth { get; set; }        
+        public DateTime? DateOfBirth { get; set; }        
         [UniqueKey(groupId: "1", order: 0)]
         [StringLength(11)]
         public string PhoneNumber { get; set; }
@@ -44,7 +44,7 @@ namespace Geep.Models.Core
         public string GeopoliticalId { get; set; }
         public string BeneficiaryFullName => LastName + " " + FirstName;
         public Agent Agent { get; set; }
-        public Association association { get; set; }
+        public Association Association { get; set; }
         public ClusterLocation ClusterLocation { get; set; }
     }
 }

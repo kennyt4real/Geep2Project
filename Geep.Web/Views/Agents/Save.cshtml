@@ -1,0 +1,154 @@
+﻿@model Geep.ViewModels.CoreVm.AgentVm
+@{
+    ViewData["Title"] = "Agents";
+}
+
+<div class="row">
+    <div class="col-md-12 ">
+        <form id="myEditform" onsubmit="return false;" asp-antiforgery="true">
+            <div class="row">
+                @if (Model != null && Model.AgentId > 0)
+                {
+                    <input type="hidden" asp-for="AgentId" />
+                    <input type="hidden" asp-for="CreatedBy" />
+                    <input type="hidden" asp-for="DateCreated" />
+                    <input type="hidden" asp-for="ReferenceId" />
+                }
+                else
+                {
+                    <div class="col-md-6 form-group">
+                        <label asp-for="ReferenceId" class="control-label"></label>
+                        <input asp-for="ReferenceId" class="form-control" />
+                        <span asp-validation-for="ReferenceId" class="text-danger"></span>
+                    </div>
+                }
+
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="LastName" class="control-label"></label>
+                    <input asp-for="LastName" class="form-control">
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="FirstName" class="control-label"></label>
+                    <input asp-for="FirstName" class="form-control">
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="MiddleName" class="control-label"></label>
+                    <input asp-for="MiddleName" class="form-control">
+                    <span asp-validation-for="MiddleName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="Gender" class="control-label"></label>
+                    <select asp-for="Gender" class="form-control" asp-items="ViewBag.Gender">
+                        <option>--Select Gender--</option>
+                    </select>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label asp-for="PhoneNumber" class="control-label"></label>
+                    <input asp-for="PhoneNumber" class="form-control">
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="DateOfBirth" class="control-label"></label>
+                    <input asp-for="DateOfBirth" class="form-control">
+                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="BVN" class="control-label"></label>
+                    <input asp-for="BVN" class="form-control">
+                    <span asp-validation-for="BVN" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="StateId" class="control-label"></label>
+                    <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="LoadLga();">
+                        <option>--Select State--</option>
+                    </select>
+                    <span asp-validation-for="StateId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="LocalGovtRefId" class="control-label"></label>
+                    <select asp-for="LocalGovtRefId" class="form-control">
+                        <option>--Select LGA--</option>
+                    </select>
+                    <span asp-validation-for="LocalGovtRefId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12  text-md-center">
+                    @if (Model != null && Model.AgentId > 0)
+                    {
+                        <input type="submit" value="UPDATE AGENT" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="ADD AGENT" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+                    }
+                    <a href="#" class="text-uppercase btn btn-rounded mb-5 btn-warning" data-dismiss="modal">CANCEL</a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+<script>
+    $("#myEditform").submit(function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+            type: "POST",
+            url: "/Agents/Save",
+            data: formData,
+            success: function (data) {
+                if (data.status) {
+                    window.oTable.ajax.reload(); //run my_fun() ondomready
+                    $('#actionsList').modal("hide");
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.warning(data.message);
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+
+    function LoadLga() {
+        var stateId = $("#StateId").val();
+        $.ajax
+            ({
+                url: '/Basic/GetLgaList?stateId=' + stateId,
+                type: 'GET',
+                datatype: 'application/json',
+                contentType: 'application/json',
+                success: function (result) {
+                    $("#LocalGovtRefId").html("");
+                    $.each($.parseJSON(result),
+                        function (i, city) {
+                            $("#LocalGovtRefId").append($('<option></option>').val(city.ReferenceId).html(city.LgaName));
+                        });
+                },
+                error: function () {
+                    alert("Whooaaa! Something went wrong..");
+                }
+            });
+    }
+
+</script>

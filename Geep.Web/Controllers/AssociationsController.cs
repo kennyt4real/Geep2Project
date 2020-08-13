@@ -9,16 +9,19 @@ using Geep.DataAccess.Context;
 using Geep.Models.Core;
 using Geep.DomainLayer.GeneralAbstractions;
 using Geep.ViewModels.CoreVm;
+using static Geep.ViewModels.Constants.PopUp;
 
 namespace Geep.Web.Controllers
 {
     public class AssociationsController : Controller
     {
         private ICrudInteger<AssociationVm> _repo;
+        private ICrudInteger<StateVm> _stateQuery;
 
-        public AssociationsController(ICrudInteger<AssociationVm> repo)
+        public AssociationsController(ICrudInteger<AssociationVm> repo, ICrudInteger<StateVm> stateQuery)
         {
             _repo = repo;
+            _stateQuery = stateQuery;
         }
 
         public IActionResult Index()
@@ -35,6 +38,14 @@ namespace Geep.Web.Controllers
         public async Task<IActionResult> Save(int id)
         {
             var model = await _repo.GetById(id);
+            var status = from Status s in Enum.GetValues(typeof(Status))
+                         select new { ID = s, Name = s.ToString() };
+
+
+            ViewData["Status"] = new SelectList(status, "Name", "Name", model?.AccreditationStstud);
+
+            ViewData["StateId"] = new SelectList(await _stateQuery.GetAll(), "StateId", "StateName", model?.StateId);
+
 
             return PartialView(model);
         }

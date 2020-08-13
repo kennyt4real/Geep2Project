@@ -9,6 +9,7 @@ namespace Geep.DomainLayer.GeneralAbstractions
     public interface ICrudInteger<T> where T : AuditVm
     {
         Task<List<T>> GetAll();
+        Task<List<T>> GetAllById(int id);
         Task<T> GetById(int id);
         Task<ResponseVm> AddOrUpdate(T t);
         Task<ResponseVm> Delete(int id);

@@ -1,0 +1,87 @@
+﻿@model Geep.ViewModels.CoreVm.LocalGovernmentAreaVm
+@{
+    ViewData["Title"] = "Local gvt";
+}
+
+<div class="row">
+    <div class="col-md-12 ">
+        <form id="myEditform" onsubmit="return false;" asp-antiforgery="true">
+            <div class="row">
+                @if (Model != null && Model.LocalGovernmentAreaId > 0)
+                {
+                    <input type="hidden" asp-for="LocalGovernmentAreaId" />
+                    <input type="hidden" asp-for="CreatedBy" />
+                    <input type="hidden" asp-for="DateCreated" />
+                }
+
+
+                <input hidden asp-for="StateId" class="form-control" value="21" />
+
+
+                <div class="col-md-12 form-group">
+                    <label asp-for="StateName" class="control-label"></label>
+                    <input disabled asp-for="StateName" class="form-control" value="Abia" />
+                    <span asp-validation-for="StateName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12 form-group">
+                    <label asp-for="LgaName" class="control-label"></label>
+                    <input asp-for="LgaName" class="form-control" />
+                    <span asp-validation-for="LgaName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12 form-group">
+                    <label asp-for="ReferenceId" class="control-label"></label>
+                    <input asp-for="ReferenceId" class="form-control">
+                    <span asp-validation-for="ReferenceId" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-md-12  text-md-center">
+                    @if (Model != null && Model.LocalGovernmentAreaId > 0)
+                    {
+                        <input type="submit" value="UPDATE LOCAL GOVT" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="ADD  LOCAL GOVT" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+                    }
+                    <a href="#" class="text-uppercase btn btn-rounded mb-5 btn-warning" data-dismiss="modal">CANCEL</a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+<script>
+        $("#myEditform").submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            $.ajax({
+                type: "POST",
+                url: "/LocalGovernmentAreas/Save",
+                data: formData,
+                success: function (data) {
+                    if (data.status) {
+                        window.oTable.ajax.reload(); //run my_fun() ondomready
+                        $('#actionsList').modal("hide");
+                        toastr.success(data.message);
+                    }
+                    else {
+                        toastr.warning(data.message);
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+
+</script>
+
+
+

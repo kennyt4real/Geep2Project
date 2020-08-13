@@ -1,101 +1,155 @@
-﻿@model IEnumerable<Geep.Models.Core.Association>
+﻿@model Geep.ViewModels.CoreVm.AssociationVm
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Association";
 }
 
-<h1>Index</h1>
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="AdminDashboard">DashBoard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Local Govt</li>
+    </ol>
+</nav>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.AssociationRefId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AssociationName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AssiciationType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LocalGovtId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SuperAgent)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AccreditationStstud)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GroupPhoneNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GroupEmail)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateCreated)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateUpdated)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedBy)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AssociationRefId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AssociationName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AssiciationType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LocalGovtId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SuperAgent)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccreditationStstud)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.GroupPhoneNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.GroupEmail)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateCreated)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateUpdated)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedBy)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.AssociationId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.AssociationId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.AssociationId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>List of Associations</h4>
+                    </div>
+                    <div class="col-md-6 text-right" >
+                        <a href="#" onclick="AddNew()" class="btn btn-primary">ADD NEW ASSOCIATION</a>
+                    </div>
+                </div>
+                <br />
+                <br />
+
+                <div class="table-responsive">
+                    <table id="Jdatatable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Reference ID</th>
+                                <th>Group Name</th>
+                                <th>Group Type</th>
+                                <th>Group Eamil</th>
+                                <th>Accreditation Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.oTable = $('#Jdatatable').DataTable({
+            destroy: true,
+            "processing": true,
+            "ajax": {
+                "url": "/Associations/GetIndex",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": "AssociationRefId", "autoWidth": true },
+                { "data": "AssociationName", "autoWidth": true },
+                { "data": "AssiciationType", "autoWidth": true },
+                { "data": "GroupEmail", "autoWidth": true },
+                { "data": "AccreditationStstud", "autoWidth": true },
+                {
+                    "data": "AssociationId",
+                    "autoWidth": true,
+                    "render": function (data) {
+                        return '<a href="#" onclick="AssociationMembers(' + data + ')"><i><u><small>Members</small></u></i></a>&nbsp;&nbsp;' +
+                            '<a href="#" onclick="Edit(' + data + ')"><i class="text-info"><u><small>Edit</small></u></i></a>&nbsp;&nbsp;' +
+                            '<a href="#" onclick="Delete(' + data + ')"><i class="text-danger"><u><small >Delete</small></u></i></a>';
+                    }
+                }
+
+            ]
+        });
+    });
+
+    function AddNew() {
+        var url = "/Associations/Save?id=0";
+        $('#myModalDivBody').load(url,
+            function () {
+                $('#actionsList').modal('show');
+            });
+    };
+
+    function Edit(associationId) {
+        var url = "/Associations/Save?id=" + associationId;
+        $('#myModalDivBody').load(url,
+            function () {
+                $('#actionsList').modal('show');
+            });
+    };
+
+    function AssociationMembers(associationId) {
+        var url = "/Beneficiaries/AssociationMembers?id=" + associationId;
+        window.open(url, '_blank');
+    };
+
+    function Delete(associationId) {
+        swal({
+            title: "Are you sure to remove this Association?",
+            text: "Once deleted, you will not be able to use this Association again!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Associations/Delete?id=" + associationId,
+                        "datatype": "json",
+                        success: function (data) {
+                            window.oTable.ajax.reload(); //run my_fun() ondomready
+                            toastr.success(data.message);
+                            swal(data.message);
+                        }
+                    });
+
+                } else {
+                    swal("Its Ok you canceled, This Association is safe!");
+                }
+            });
+    };
+
+   
+    $("#myform").submit(function (e) {
+        e.preventDefault();
+        alert("Hi");
+        var formData = new FormData(this);
+        $.ajax({
+            type: "POST",
+            url: "/States/Save",
+            data: formData,
+            success: function (data) {
+                if (data.status) {
+                    window.oTable.ajax.reload(); //run my_fun() ondomready
+                    $("#myform")[0].reset()
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.warning(data.message);
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+
+</script>

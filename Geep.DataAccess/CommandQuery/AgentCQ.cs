@@ -51,6 +51,9 @@ namespace Geep.DataAccess.CommandQuery
             return await _repo.SaveChangesAsync();
         }
 
-       
+        public async Task<List<AgentVm>> GetAllById(int id)
+        {
+            return _mapper.Map<List<AgentVm>>(await _repo.GetAllById("", x => x.LocalGovtRefId.Equals(id)));
+        }
     }
 }

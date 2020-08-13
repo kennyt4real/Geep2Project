@@ -11,7 +11,6 @@ namespace Geep.Models.Core
         [UniqueKey(groupId: "1", order: 0)]
         public int ReferenceId { get; set; }
         public ICollection<LocalGovernmentArea> LocalGovernmentAreas { get; set; }
-        public ICollection<ClusterLocation> ClusterLocations { get; set; }
 
 
     }

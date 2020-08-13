@@ -1,71 +1,182 @@
-﻿@model IEnumerable<Geep.Models.Core.LocalGovernmentArea>
+﻿@model Geep.ViewModels.CoreVm.LocalGovernmentAreaVm
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="AdminDashboard">DashBoard</a></li>
+        <li class="breadcrumb-item"><a asp-controller="States" asp-action="Index">States</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Local Govt</li>
+    </ol>
+</nav>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.LgaName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReferenceId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.State)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateCreated)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateUpdated)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedBy)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.LgaName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReferenceId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.State.StateId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateCreated)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateUpdated)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedBy)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.LocalGovernmentAreaId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.LocalGovernmentAreaId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.LocalGovernmentAreaId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-md-4 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="col-md-12 text-center">
+                    <h5> <b>ADD NEW LOCAL GOVT</b></h5>
+                </div>
+                <br />
+                <form id="myform" onsubmit="return false;" asp-antiforgery="true">
+                    <div class="row">
+
+                        <input hidden asp-for="StateId" class="form-control" value="21" />
+
+
+                        <div class="col-md-12 form-group">
+                            <label asp-for="StateName" class="control-label"></label>
+                            <input disabled asp-for="StateName" class="form-control" value="Abia" />
+                            <span asp-validation-for="StateName" class="text-danger"></span>
+                        </div>
+
+
+
+                        <div class="col-md-12 form-group">
+                            <label asp-for="LgaName" class="control-label"></label>
+                            <input asp-for="LgaName" class="form-control" />
+                            <span asp-validation-for="LgaName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-12 form-group">
+                            <label asp-for="ReferenceId" class="control-label"></label>
+                            <input asp-for="ReferenceId" class="form-control">
+                            <span asp-validation-for="ReferenceId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-12  text-md-center">
+                            <input type="submit" value="ADD LOCAL GOVT" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+
+                            <a href="#" class="text-uppercase btn btn-rounded mb-5 btn-warning" data-dismiss="modal">CANCEL</a>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>List of @ViewBag.StateName State Local Governments</h4>
+                    </div>
+                </div>
+                <br />
+                <br />
+
+                <div class="table-responsive">
+                    <table id="Jdatatable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Reference ID</th>
+                                <th>Local Govt Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.oTable = $('#Jdatatable').DataTable({
+            destroy: true,
+            "processing": true,
+            "ajax": {
+                "url": "/LocalGovernmentAreas/GetIndex?id=@ViewBag.StateId",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": "ReferenceId", "autoWidth": true },
+                { "data": "LgaName", "autoWidth": true },
+                {
+                    "data": "LocalGovernmentAreaId",
+                    "autoWidth": true,
+                    "render": function (data) {
+                        return '<a href="#" onclick="Edit(' + data + ')"><i><u><small>Edit</small></u></i></a>&nbsp;&nbsp;' +
+                            '<a href="#" onclick="Delete(' + data + ')"><i class="text-danger"><u><small >Delete</small></u></i></a>';
+                    }
+                }
+
+            ]
+        });
+    });
+
+    function AddNew() {
+        var url = "/LocalGovernmentAreas/Save?id=0";
+        $('#myModalDivBody').load(url,
+            function () {
+                $('#actionsList').modal('show');
+            });
+    };
+
+    function Edit(localGovernmentAreaId) {
+        var url = "/LocalGovernmentAreas/Save?id=" + localGovernmentAreaId;
+        $('#myModalDivBody').load(url,
+            function () {
+                $('#actionsList').modal('show');
+            });
+    };
+
+    function Delete(localGovernmentAreaId) {
+        swal({
+            title: "Are you sure to remove this Local Government?",
+            text: "Once deleted, you will not be able to use this Local Government again!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/LocalGovernmentAreas/Delete?id=" + localGovernmentAreaId,
+                        "datatype": "json",
+                        success: function (data) {
+                            window.oTable.ajax.reload(); //run my_fun() ondomready
+                            toastr.success(data.message);
+                            swal(data.message);
+                        }
+                    });
+
+                } else {
+                    swal("Its Ok you canceled, This Local Government is safe!");
+                }
+            });
+    };
+
+    $("#myform").submit(function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+            type: "POST",
+            url: "/LocalGovernmentAreas/Save",
+            data: formData,
+            success: function (data) {
+                if (data.status) {
+                    window.oTable.ajax.reload(); //run my_fun() ondomready
+                    $("#myform")[0].reset()
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.warning(data.message);
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+
+</script>

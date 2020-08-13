@@ -26,6 +26,11 @@ namespace Geep.DataAccess.CommandQuery
             return _mapper.Map<List<ClusterLocationVm>>(await _repo.GetAll($"{nameof(State)}"));
         }
 
+        public async Task<List<ClusterLocationVm>> GetAllById(int id)
+        {
+            return _mapper.Map<List<ClusterLocationVm>>(await _repo.GetAllById($"{nameof(State)}", x => x.State.StateId.Equals(id)));
+        }
+
         public async Task<ClusterLocationVm> GetById(int id)
         {
             return _mapper.Map<ClusterLocationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x=>x.ClusterLocationId.Equals(id),$"{nameof(State)}"));

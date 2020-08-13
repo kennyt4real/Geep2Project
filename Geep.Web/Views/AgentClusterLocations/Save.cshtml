@@ -1,0 +1,106 @@
+﻿@model Geep.ViewModels.CoreVm.AgentClusterLocationVm
+@{
+    ViewData["Title"] = "Agent Cluster";
+}
+
+<div class="row">
+    <div class="col-md-12 ">
+        <form id="myEditform" onsubmit="return false;" asp-antiforgery="true">
+            <div class="row">
+                @if (Model != null && Model.AgentClusterLocationId > 0)
+                {
+                    <input type="hidden" asp-for="AgentClusterLocationId" />
+                    <input type="hidden" asp-for="CreatedBy" />
+                    <input type="hidden" asp-for="DateCreated" />
+                }
+                <div class="col-md-12 form-group">
+                    <label asp-for="StateId" class="control-label"></label>
+                    <select id="state2" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="LoadClusters2();">
+                        <option>--Select State--</option>
+                    </select>
+                    <span asp-validation-for="StateId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12 form-group">
+                    <label asp-for="AgentId" class="control-label"></label>
+                    <select asp-for="AgentId" class="form-control" asp-items="ViewBag.AgentId">
+                        <option>--Select Agent--</option>
+                    </select>
+                    <span asp-validation-for="AgentId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12 form-group">
+                    <label asp-for="ClusterLocationId" class="control-label"></label>
+                    <select id="ClusterLocationId2" asp-for="ClusterLocationId" class="form-control">
+                        <option>--Select Cluster Location--</option>
+                    </select>
+                    <span asp-validation-for="ClusterLocationId" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-md-12  text-md-center">
+                    @if (Model != null && Model.AgentClusterLocationId > 0)
+                    {
+                        <input type="submit" value="UPDATE AGENT CLUSTER" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="ADD AGENT CLUSTER" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+                    }
+                    <a href="#" class="text-uppercase btn btn-rounded mb-5 btn-warning" data-dismiss="modal">CANCEL</a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+<script>
+    $("#myEditform").submit(function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+            type: "POST",
+            url: "/AgentClusterLocations/Save",
+            data: formData,
+            success: function (data) {
+                if (data.status) {
+                    window.oTable.ajax.reload(); //run my_fun() ondomready
+                    $('#actionsList').modal("hide");
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.warning(data.message);
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+
+   function LoadClusters2() {
+       var stateId = $("#state2").val();
+        $.ajax
+            ({
+                url: '/Basic/GetClusterList?stateId=' + stateId,
+                type: 'GET',
+                datatype: 'application/json',
+                contentType: 'application/json',
+                success: function (result) {
+                    $("#ClusterLocationId2").html("");
+                    $.each($.parseJSON(result),
+                        function (i, city) {
+                            $("#ClusterLocationId2").append($('<option></option>').val(city.ClusterLocationId).html(city.Name));
+                        });
+                },
+                error: function () {
+                    alert("Whooaaa! Something went wrong..");
+                }
+            });
+    }
+
+</script>

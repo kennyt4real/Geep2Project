@@ -24,11 +24,18 @@ namespace Geep.DataAccess.CommandQuery
             return _mapper.Map<List<LocalGovernmentAreaVm>>(await _repo.GetAll($"{nameof(State)}"));
         }
 
+        public async Task<List<LocalGovernmentAreaVm>> GetAllById(int id)
+        {
+            return _mapper.Map<List<LocalGovernmentAreaVm>>(await _repo.GetAllById($"{nameof(State)}", x => x.StateId.Equals(id)));
+        }
+
         public async Task<LocalGovernmentAreaVm> GetById(int id)
         {
             return _mapper.Map<LocalGovernmentAreaVm>(await _repo.GetFirstOrDeafultWithNoTracking(x=>x.LocalGovernmentAreaId.Equals(id),
                                         $"{nameof(State)}"));
         }
+
+       
         public async Task<ResponseVm> AddOrUpdate(LocalGovernmentAreaVm vm)
         {
             var model = _mapper.Map<LocalGovernmentArea>(vm);
@@ -42,6 +49,8 @@ namespace Geep.DataAccess.CommandQuery
             }
             return await _repo.SaveChangesAsync();
         }
+
+      
 
         public async Task<ResponseVm> Delete(int id)
         {

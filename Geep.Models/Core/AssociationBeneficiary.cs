@@ -8,7 +8,7 @@ namespace Geep.Models.Core
     {
         public int AssociationBeneficiaryId { get; set; }
         public int AssociationId { get; set; }
-        public int BeneficiaryId { get; set; }
+        public int? BeneficiaryId { get; set; }
         public Association Association { get; set; }
         public Beneficiary Beneficiary { get; set; }
     }

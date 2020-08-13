@@ -115,7 +115,7 @@ namespace Geep.DataAccess.Migrations
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e513",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e32275d3-5024-4281-887a-cd3a26bd971c",
+                            ConcurrencyStamp = "32d3c82f-a8c4-4ddf-8961-6de30bcc5ee2",
                             Email = "Admin@geepproject.com",
                             EmailConfirmed = true,
                             IsGoogleAuthenticatorEnabled = false,
@@ -124,7 +124,7 @@ namespace Geep.DataAccess.Migrations
                             NormalizedEmail = "ADMIN@GEEPPROJECT.COM",
                             NormalizedUserName = "ADMIN@GEEPPROJECT.COM",
                             NumberOfLogins = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAECZb4d891SJuWCtajGaV2cPWKvwtZ5TdKohychS440nozaqBdS9TsehKY53iVNttaw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEKveCrlnVsViuE2nN7HZfueVBCjk6nGldF9HsQ6v7qtuN6rlWmYS7fhLyLl5Qu5z0w==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -134,7 +134,7 @@ namespace Geep.DataAccess.Migrations
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e613",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "81583c71-a5d8-430e-85e7-83874ea5b68c",
+                            ConcurrencyStamp = "0e48136e-e533-4ce0-9b7b-37f303a7a702",
                             Email = "SuperAdmin@geepproject.com",
                             EmailConfirmed = true,
                             IsGoogleAuthenticatorEnabled = false,
@@ -143,7 +143,7 @@ namespace Geep.DataAccess.Migrations
                             NormalizedEmail = "SUPERADMIN@GEEPPROJECT.COM",
                             NormalizedUserName = "SUPERADMIN@GEEPPROJECT.COM",
                             NumberOfLogins = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAENnr0Zc2Ddy6OAshlfRNBG96gSezvhz4ekrHzBWiAiDTX3nOI6wH147UvFCyrW4KBQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEH8vs6YdyGBo3sTGeiCrpGWa5j7YCRSdwPh/A1lgdjPsc+YIcR28Nu9qChlo9+DidQ==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -153,12 +153,10 @@ namespace Geep.DataAccess.Migrations
 
             modelBuilder.Entity("Geep.Models.Core.Agent", b =>
                 {
-                    b.Property<string>("ReferenceId")
-                        .HasColumnType("nvarchar(9)")
-                        .HasMaxLength(9);
-
                     b.Property<int>("AgentId")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("BVN")
                         .HasColumnType("nvarchar(max)");
@@ -169,8 +167,8 @@ namespace Geep.DataAccess.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DateOfBirth")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateUpdated")
                         .HasColumnType("datetime2");
@@ -196,10 +194,17 @@ namespace Geep.DataAccess.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ReferenceId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ReferenceId");
+                    b.HasKey("AgentId");
+
+                    b.HasIndex("ReferenceId")
+                        .IsUnique()
+                        .HasFilter("[ReferenceId] IS NOT NULL");
 
                     b.ToTable("Agents");
                 });
@@ -213,9 +218,6 @@ namespace Geep.DataAccess.Migrations
 
                     b.Property<int>("AgentId")
                         .HasColumnType("int");
-
-                    b.Property<string>("AgentReferenceId")
-                        .HasColumnType("nvarchar(9)");
 
                     b.Property<int>("ClusterLocationId")
                         .HasColumnType("int");
@@ -234,7 +236,7 @@ namespace Geep.DataAccess.Migrations
 
                     b.HasKey("AgentClusterLocationId");
 
-                    b.HasIndex("AgentReferenceId");
+                    b.HasIndex("AgentId");
 
                     b.HasIndex("ClusterLocationId");
 
@@ -276,10 +278,7 @@ namespace Geep.DataAccess.Migrations
                     b.Property<string>("GroupPhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("LocalGovernmentAreaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LocalGovtId")
+                    b.Property<int>("LocalGovernmentAreaId")
                         .HasColumnType("int");
 
                     b.Property<string>("SuperAgent")
@@ -309,7 +308,7 @@ namespace Geep.DataAccess.Migrations
                     b.Property<int>("AssociationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("BeneficiaryId")
+                    b.Property<int?>("BeneficiaryId")
                         .HasColumnType("int");
 
                     b.Property<string>("CreatedBy")
@@ -346,9 +345,6 @@ namespace Geep.DataAccess.Migrations
                     b.Property<int>("AgentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("AgentReferenceId")
-                        .HasColumnType("nvarchar(9)");
-
                     b.Property<int?>("AssociationId")
                         .HasColumnType("int");
 
@@ -373,8 +369,8 @@ namespace Geep.DataAccess.Migrations
                     b.Property<string>("DateEnumerated")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DateOfBirth")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateUpdated")
                         .HasColumnType("datetime2");
@@ -454,7 +450,7 @@ namespace Geep.DataAccess.Migrations
 
                     b.HasKey("BeneficiaryId");
 
-                    b.HasIndex("AgentReferenceId");
+                    b.HasIndex("AgentId");
 
                     b.HasIndex("AssociationId");
 
@@ -474,8 +470,8 @@ namespace Geep.DataAccess.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("AgentReferenceId")
-                        .HasColumnType("nvarchar(9)");
+                    b.Property<int?>("AgentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -500,7 +496,7 @@ namespace Geep.DataAccess.Migrations
 
                     b.HasKey("ClusterLocationId");
 
-                    b.HasIndex("AgentReferenceId");
+                    b.HasIndex("AgentId");
 
                     b.HasIndex("ReferenceId")
                         .IsUnique();
@@ -611,21 +607,21 @@ namespace Geep.DataAccess.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e513",
-                            ConcurrencyStamp = "a1f608e2-1bca-4f43-9468-5d32516b737d",
+                            ConcurrencyStamp = "631da3ed-1fc5-4f80-a681-5a60c17c700f",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e613",
-                            ConcurrencyStamp = "7032c745-b567-435a-9ea1-b62d630ee76e",
+                            ConcurrencyStamp = "15cebfa3-014f-4297-9c66-1c25dd36f903",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "a18be9c0-aak5-4af8-bd17-00bd934nfn13",
-                            ConcurrencyStamp = "a5ef3495-c936-41be-bf14-a337fb92a82a",
+                            ConcurrencyStamp = "dd70e4d8-09cc-43be-bb1f-d17055d3a265",
                             Name = "QualityControl",
                             NormalizedName = "QUALITYCONTROL"
                         });
@@ -751,7 +747,9 @@ namespace Geep.DataAccess.Migrations
                 {
                     b.HasOne("Geep.Models.Core.Agent", "Agent")
                         .WithMany()
-                        .HasForeignKey("AgentReferenceId");
+                        .HasForeignKey("AgentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Geep.Models.Core.ClusterLocation", "ClusterLocation")
                         .WithMany()
@@ -764,7 +762,9 @@ namespace Geep.DataAccess.Migrations
                 {
                     b.HasOne("Geep.Models.Core.LocalGovernmentArea", "LocalGovernmentArea")
                         .WithMany()
-                        .HasForeignKey("LocalGovernmentAreaId");
+                        .HasForeignKey("LocalGovernmentAreaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Geep.Models.Core.AssociationBeneficiary", b =>
@@ -777,18 +777,18 @@ namespace Geep.DataAccess.Migrations
 
                     b.HasOne("Geep.Models.Core.Beneficiary", "Beneficiary")
                         .WithMany()
-                        .HasForeignKey("BeneficiaryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BeneficiaryId");
                 });
 
             modelBuilder.Entity("Geep.Models.Core.Beneficiary", b =>
                 {
                     b.HasOne("Geep.Models.Core.Agent", "Agent")
                         .WithMany()
-                        .HasForeignKey("AgentReferenceId");
+                        .HasForeignKey("AgentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Geep.Models.Core.Association", "association")
+                    b.HasOne("Geep.Models.Core.Association", "Association")
                         .WithMany()
                         .HasForeignKey("AssociationId");
 
@@ -803,10 +803,10 @@ namespace Geep.DataAccess.Migrations
                 {
                     b.HasOne("Geep.Models.Core.Agent", null)
                         .WithMany("ClusterLocations")
-                        .HasForeignKey("AgentReferenceId");
+                        .HasForeignKey("AgentId");
 
                     b.HasOne("Geep.Models.Core.State", "State")
-                        .WithMany("ClusterLocations")
+                        .WithMany()
                         .HasForeignKey("StateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

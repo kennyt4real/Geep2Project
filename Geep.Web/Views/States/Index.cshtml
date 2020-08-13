@@ -1,65 +1,183 @@
-﻿@model IEnumerable<Geep.Models.Core.State>
+﻿@model Geep.ViewModels.CoreVm.StateVm
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="AdminDashboard">DashBoard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">States</li>
+    </ol>
+</nav>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.StateName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReferenceId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateCreated)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateUpdated)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedBy)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.StateName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReferenceId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateCreated)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateUpdated)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedBy)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.StateId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.StateId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.StateId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-md-4 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="col-md-12 text-center">
+                    <h5> <b>ADD NEW STATE</b></h5>
+                </div>
+                <br />
+                <form id="myform" onsubmit="return false;" asp-antiforgery="true">
+                    <div class="row">
+
+                        <div class="col-md-12 form-group">
+                            <label asp-for="StateName" class="control-label"></label>
+                            <input asp-for="StateName" class="form-control" />
+                            <span asp-validation-for="StateName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-12 form-group">
+                            <label asp-for="ReferenceId" class="control-label"></label>
+                            <input asp-for="ReferenceId" class="form-control">
+                            <span asp-validation-for="ReferenceId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-12  text-md-center">
+                            <input type="submit" value="ADD STATE" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+
+                            <a href="#" class="text-uppercase btn btn-rounded mb-5 btn-warning" data-dismiss="modal">CANCEL</a>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>List of States</h4>
+                    </div>
+                    @*<div class="col-md-6 text-right">
+                        <a href="#" onclick="AddNew()" class="btn btn-primary">ADD NEW STATE</a>
+                    </div>*@
+                </div>
+                <br />
+                <br />
+
+                <div class="table-responsive">
+                    <table id="Jdatatable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Reference ID</th>
+                                <th>State Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.oTable = $('#Jdatatable').DataTable({
+            destroy: true,
+            "processing": true,
+            "ajax": {
+                "url": "/States/GetIndex",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": "ReferenceId", "autoWidth": true },
+                { "data": "StateName", "autoWidth": true },
+                {
+                    "data": "StateId",
+                    "autoWidth": true,
+                    "render": function (data) {
+                        return '<a href="#" onclick="LocalGovt(' + data + ')"><i><u><small>Local Governments</small></u></i></a>&nbsp;&nbsp;' +
+                            '<a href="#" onclick="Edit(' + data + ')"><i class="text-info"><u><small>Edit</small></u></i></a>&nbsp;&nbsp;' +
+                            '<a href="#" onclick="Delete(' + data + ')"><i class="text-danger"><u><small >Delete</small></u></i></a>';
+                    }
+                }
+
+            ]
+        });
+    });
+
+    function AddNew() {
+        var url = "/States/Save?id=0";
+        $('#myModalDivBody').load(url,
+            function () {
+                $('#actionsList').modal('show');
+            });
+    };
+
+    function LocalGovt(stateId) {
+        var url = "/LocalGovernmentAreas/Index?id=" + stateId;
+        window.open(url, '_blank');
+
+    }
+
+
+    function Edit(stateId) {
+        var url = "/States/Save?id=" + stateId;
+        $('#myModalDivBody').load(url,
+            function () {
+                $('#actionsList').modal('show');
+            });
+    };
+
+    function Delete(stateId) {
+        swal({
+            title: "Are you sure to remove this State?",
+            text: "Once deleted, you will not be able to use this State again!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/States/Delete?id=" + stateId,
+                        "datatype": "json",
+                        success: function (data) {
+                            window.oTable.ajax.reload(); //run my_fun() ondomready
+                            toastr.success(data.message);
+                            swal(data.message);
+                        }
+                    });
+
+                } else {
+                    swal("Its Ok you canceled, This State is safe!");
+                }
+            });
+    };
+
+    $("#myform").submit(function (e) {
+        e.preventDefault();
+        alert("Hi");
+        var formData = new FormData(this);
+        $.ajax({
+            type: "POST",
+            url: "/States/Save",
+            data: formData,
+            success: function (data) {
+                if (data.status) {
+                    window.oTable.ajax.reload(); //run my_fun() ondomready
+                    $("#myform")[0].reset()
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.warning(data.message);
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+
+</script>

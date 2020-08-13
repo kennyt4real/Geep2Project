@@ -52,6 +52,9 @@ namespace Geep.DataAccess.CommandQuery
 
         }
 
-       
+        public Task<List<BeneficiaryVm>> GetAllById(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

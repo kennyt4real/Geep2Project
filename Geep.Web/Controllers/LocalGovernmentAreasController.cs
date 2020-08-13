@@ -15,20 +15,25 @@ namespace Geep.Web.Controllers
     public class LocalGovernmentAreasController : Controller
     {
         private ICrudInteger<LocalGovernmentAreaVm> _repo;
+        private ICrudInteger<StateVm> _stateQuery;
 
-        public LocalGovernmentAreasController(ICrudInteger<LocalGovernmentAreaVm> repo)
+        public LocalGovernmentAreasController(ICrudInteger<LocalGovernmentAreaVm> repo, ICrudInteger<StateVm> stateQuery)
         {
             _repo = repo;
+            _stateQuery = stateQuery;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int id)
         {
+            ViewData["StateId"] = id;
+            ViewData["StateName"] = _stateQuery.GetById(id).Result.StateName;
             return View();
         }
 
-        public async Task<IActionResult> GetIndex()
+        public async Task<IActionResult> GetIndex(int id)
         {
-            var data = await _repo.GetAll();
+
+            var data = await _repo.GetAllById(id);
             return Json(new { data });
         }
 

@@ -19,7 +19,7 @@ namespace Geep.ViewModels.CoreVm
         public string LastName { get; set; }
         public string MiddleName { get; set; }
         public string Gender { get; set; }
-        public string DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
         [StringLength(11)]
         public string PhoneNumber { get; set; }
         public string BVN { get; set; }
@@ -43,5 +43,9 @@ namespace Geep.ViewModels.CoreVm
         public string GeopoliticalId { get; set; }
         public string AgentName { get; set; }
         public string AgentRefId { get; set; }
+        public string AssociationName { get; set; }
+        public string BeneficiaryFullName => $"{LastName} {FirstName} {MiddleName}";
+        public AgentVm  Agent { get; set; }
+
     }
 }

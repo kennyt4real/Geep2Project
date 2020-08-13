@@ -15,14 +15,23 @@ namespace Geep.Web.Controllers
     public class AgentClusterLocationsController : Controller
     {
         private ICrudInteger<AgentClusterLocationVm> _repo;
+        private ICrudInteger<StateVm> _stateQuery;
+        private readonly ICrudInteger<AgentVm> _agentQuery;
+        private readonly ICrudInteger<ClusterLocationVm> _clusterQuery;
 
-        public AgentClusterLocationsController(ICrudInteger<AgentClusterLocationVm> repo)
+        public AgentClusterLocationsController(ICrudInteger<AgentClusterLocationVm> repo, ICrudInteger<StateVm> stateQuery, 
+                                            ICrudInteger<AgentVm> agentQuery, ICrudInteger<ClusterLocationVm> clusterQuery )
         {
             _repo = repo;
+            _stateQuery = stateQuery;
+            _agentQuery = agentQuery;
+            _clusterQuery = clusterQuery;
         }
 
-        public IActionResult Index()
+        public async  Task<IActionResult> Index()
         {
+            ViewData["StateId"] = new SelectList(await _stateQuery.GetAll(), "StateId", "StateName");
+            ViewData["AgentId"] = new SelectList(await _agentQuery.GetAll(), "AgentId", "AgentFullName");
             return View();
         }
 
@@ -35,6 +44,9 @@ namespace Geep.Web.Controllers
         public async Task<IActionResult> Save(int id)
         {
             var model = await _repo.GetById(id);
+            ViewData["StateId"] = new SelectList(await _stateQuery.GetAll(), "StateId", "StateName",model?.StateId);
+            ViewData["AgentId"] = new SelectList(await _agentQuery.GetAll(), "AgentId", "AgentFullName", model?.AgentId);
+            //ViewData["ClusterLocationId"] = new SelectList(await _clusterQuery.GetAllById(model.StateId), "ClusterLocationId", "Name", model?.ClusterLocationId);
 
             return PartialView(model);
         }

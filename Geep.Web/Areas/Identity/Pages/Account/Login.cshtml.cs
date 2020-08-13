@@ -84,6 +84,10 @@ namespace Geep.Web.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+                    if (returnUrl.Equals("/") || string.IsNullOrEmpty(returnUrl))
+                    {
+                        return RedirectToAction("CustomDashboard", "Home");
+                    }
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

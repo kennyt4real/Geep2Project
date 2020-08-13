@@ -1,0 +1,86 @@
+﻿@model Geep.ViewModels.CoreVm.ClusterLocationVm
+@{
+    ViewData["Title"] = "Bank";
+}
+
+<div class="row">
+    <div class="col-md-12 ">
+        <form id="myEditform" onsubmit="return false;" asp-antiforgery="true">
+            <div class="row">
+                @if (Model != null && Model.ClusterLocationId > 0)
+                {
+                    <input type="hidden" asp-for="ClusterLocationId" />
+                    <input type="hidden" asp-for="CreatedBy" />
+                    <input type="hidden" asp-for="DateCreated" />
+                }
+
+                <div class="col-md-12 form-group">
+                    <label asp-for="ReferenceId" class="control-label"></label>
+                    <input asp-for="ReferenceId" class="form-control">
+                    <span asp-validation-for="ReferenceId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12 form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control">
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12 form-group">
+                    <label asp-for="StateId" class="control-label"></label>
+                    <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId">
+                        <option>--Select State--</option>
+                    </select>
+                    <span asp-validation-for="StateId" class="text-danger"></span>
+                </div>
+
+
+
+                <div class="col-md-12  text-md-center">
+                    @if (Model != null && Model.ClusterLocationId > 0)
+                    {
+                        <input type="submit" value="UPDATE CLUSTER" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="ADD CLUSTER" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+                    }
+                    <a href="#" class="text-uppercase btn btn-rounded mb-5 btn-warning" data-dismiss="modal">CANCEL</a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+<script>
+        $("#myEditform").submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            $.ajax({
+                type: "POST",
+                url: "/ClusterLocations/Save",
+                data: formData,
+                success: function (data) {
+                    if (data.status) {
+                        window.oTable.ajax.reload(); //run my_fun() ondomready
+                        $('#actionsList').modal("hide");
+                        toastr.success(data.message);
+                    }
+                    else {
+                        toastr.warning(data.message);
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+
+</script>
+
+
+

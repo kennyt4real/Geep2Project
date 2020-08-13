@@ -1,6 +1,16 @@
-﻿using Geep.ViewModels;
+﻿using AutoMapper;
+using Geep.DataAccess.CommandQuery;
+using Geep.DataAccess.Concrete;
+using Geep.DomainLayer;
+using Geep.DomainLayer.CustomAbstrations;
+using Geep.DomainLayer.GeneralAbstractions;
+using Geep.DomainLayer.Mapper;
+using Geep.ViewModels;
+using Geep.ViewModels.CoreVm;
+using Geep.Web.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +27,22 @@ namespace Geep.Web
             services.Configure<PasswordGenSetting>(configuration.GetSection("PasswordGenParam"));
             #endregion
 
+
+            //services.AddScoped(typeof(IPasswordGenerator), typeof(PasswordGenerator));
+            services.AddScoped(typeof(IRepo<>), typeof(Repo<>));
+            services.AddScoped(typeof(IUserContext), typeof(UserContext));
+            services.AddScoped(typeof(ICrudInteger<AgentVm>), typeof(AgentCQ));
+            services.AddScoped(typeof(ICrudInteger<AgentClusterLocationVm>), typeof(AgentClusterLocationCQ));
+            services.AddScoped(typeof(ICrudInteger<AssociationVm>), typeof(AssociationCQ));
+            services.AddScoped(typeof(ICrudInteger<AssociationBeneficiaryVm>), typeof(AssociationBeneficiaryCQ));
+            services.AddScoped(typeof(ICrudInteger<BeneficiaryVm>), typeof(BeneficiaryCQ));
+            services.AddScoped(typeof(ICrudInteger<ClusterLocationVm>), typeof(ClusterLocationCQ));
+            services.AddScoped(typeof(ICrudInteger<LocalGovernmentAreaVm>), typeof(LocalGovernmentAreaCQ));
+            services.AddScoped(typeof(IBeneficiaryManagement), typeof(BeneficiaryManagement));
+            services.AddScoped(typeof(ICrudInteger<StateVm>), typeof(StateCQ));
+
+            services.AddHttpContextAccessor();
+
             services.ConfigureApplicationCookie(options =>
             {
                 // Cookie settings
@@ -26,6 +52,21 @@ namespace Geep.Web
                 options.LoginPath = "/Identity/Account/Login";
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
                 options.SlidingExpiration = true;
+            });
+
+            // Auto Mapper Configurations
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MapProfile());
+            });
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
+
+
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "GEEP2 Dashboard", Version = "v1" });
             });
 
             services.AddMvc()
@@ -53,6 +94,7 @@ namespace Geep.Web
                 });
             });
 
+            services.AddAuthentication();
 
             //services.Configure<GzipCompressionProviderOptions>(options => options.Level = System.IO.Compression.CompressionLevel.Optimal);
             //services.AddResponseCompression();

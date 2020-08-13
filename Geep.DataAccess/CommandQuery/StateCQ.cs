@@ -49,5 +49,9 @@ namespace Geep.DataAccess.CommandQuery
 
         }
 
+        public Task<List<StateVm>> GetAllById(int id)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

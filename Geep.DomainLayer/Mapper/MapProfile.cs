@@ -20,6 +20,7 @@ namespace Geep.DomainLayer.Mapper
             CreateMap<BeneficiaryVm, Beneficiary>();
             CreateMap<Beneficiary, BeneficiaryVm>()
                     .ForMember(x => x.AgentName, o => o.MapFrom(source => source.Agent.AgentFullName))
+                    .ForMember(x => x.AssociationName, o => o.MapFrom(source => source.Association.AssociationName))
                     .ForMember(x=>x.AgentRefId, o=>o.MapFrom(source=>source.Agent.ReferenceId));
 
 
@@ -31,7 +32,7 @@ namespace Geep.DomainLayer.Mapper
                 .ForMember(x => x.ClusterStateName, o => o.MapFrom(source => source.ClusterLocation.State.StateName));
 
 
-            CreateMap<State, StateVm>();
+            CreateMap<State, StateVm>().ReverseMap();
 
 
             CreateMap<LocalGovernmentAreaVm, LocalGovernmentArea>();
@@ -51,7 +52,7 @@ namespace Geep.DomainLayer.Mapper
                 .ForMember(x => x.AssociationName, o => o.MapFrom(x => x.Association.AssociationName));
 
 
-            CreateMap<ClusterLocationVm, ClusterLocationVm>();
+            CreateMap<ClusterLocationVm, ClusterLocation>();
             CreateMap<ClusterLocation, ClusterLocationVm>()
                 .ForMember(x => x.StateName, o => o.MapFrom(source => source.State.StateName));
         }

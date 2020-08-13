@@ -1,0 +1,79 @@
+﻿
+@{
+    ViewData["Title"] = "GroupMembers";
+}
+
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="AdminDashboard">DashBoard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Beneficiaries</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>List of @ViewBag.AssociationName Beneficiaries</h4>
+                    </div>
+                </div>
+                <br />
+                <br />
+
+                <div class="table-responsive">
+                    <table id="Jdatatable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Beneficiary Name</th>
+                                <th>Phone Number</th>
+                                <th>Enumeration Date</th>
+                                <th>Association Name</th>
+                                <th>Agent Name</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.oTable = $('#Jdatatable').DataTable({
+            destroy: true,
+            "processing": true,
+            "ajax": {
+                "url": "/Beneficiaries/GetAssociationMembers?id=@ViewBag.AssociationId",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": "BeneficiaryFullName", "autoWidth": true },
+                { "data": "PhoneNumber", "autoWidth": true },
+                { "data": "DateEnumerated", "autoWidth": true },
+                { "data": "AssociationName", "autoWidth": true },
+                { "data": "AgentName", "autoWidth": true },
+            ]
+        });
+    });
+
+
+
+    function Edit(associationId) {
+        var url = "/Beneficiaries/Save?id=" + associationId;
+        $('#myModalDivBody').load(url,
+            function () {
+                $('#actionsList').modal('show');
+            });
+    };
+
+
+
+</script>

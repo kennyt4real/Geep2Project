@@ -21,12 +21,14 @@ namespace Geep.DataAccess.CommandQuery
 
         public async Task<List<AgentClusterLocationVm>> GetAll()
         {
-            return _mapper.Map<List<AgentClusterLocationVm>>(await _repo.GetAll($"{nameof(Agent)},{nameof(ClusterLocation)}"));
+            var model = await _repo.GetAll($"Agent,{nameof(ClusterLocation)}.{nameof(State)}");
+
+            return _mapper.Map<List<AgentClusterLocationVm>>(model);
         }
 
         public async Task<AgentClusterLocationVm> GetById(int id)
         {
-            return _mapper.Map<AgentClusterLocationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x=>x.AgentClusterLocationId.Equals(id),
+            return _mapper.Map<AgentClusterLocationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x => x.AgentClusterLocationId.Equals(id),
                                                                         $"{nameof(Agent)},{nameof(ClusterLocation)}"));
         }
         public async Task<ResponseVm> AddOrUpdate(AgentClusterLocationVm vm)
@@ -50,5 +52,9 @@ namespace Geep.DataAccess.CommandQuery
 
         }
 
+        public Task<List<AgentClusterLocationVm>> GetAllById(int id)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

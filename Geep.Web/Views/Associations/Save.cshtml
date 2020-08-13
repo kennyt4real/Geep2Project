@@ -1,0 +1,139 @@
+﻿@model Geep.ViewModels.CoreVm.AssociationVm
+@{
+    ViewData["Title"] = "Association";
+}
+
+<div class="row">
+    <div class="col-md-12 ">
+        <form id="myEditform" onsubmit="return false;" asp-antiforgery="true">
+            <div class="row">
+                @if (Model != null && Model.AssociationId > 0)
+                {
+                    <input type="hidden" asp-for="AssociationId" />
+                    <input type="hidden" asp-for="CreatedBy" />
+                    <input type="hidden" asp-for="DateCreated" />
+                }
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="AssociationRefId" class="control-label"></label>
+                    <input asp-for="AssociationRefId" class="form-control" />
+                    <span asp-validation-for="AssociationRefId" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label asp-for="AssociationName" class="control-label"></label>
+                    <input asp-for="AssociationName" class="form-control">
+                    <span asp-validation-for="AssociationName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="AssiciationType" class="control-label"></label>
+                    <input asp-for="AssiciationType" class="form-control">
+                    <span asp-validation-for="AssiciationType" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="SuperAgent" class="control-label"></label>
+                    <input asp-for="SuperAgent" class="form-control">
+                    <span asp-validation-for="SuperAgent" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="AccreditationStstud" class="control-label"></label>
+                    <select asp-for="AccreditationStstud" class="form-control" asp-items="ViewBag.Status">
+                        <option>--Select Status--</option>
+                    </select>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label asp-for="GroupPhoneNumber" class="control-label"></label>
+                    <input asp-for="GroupPhoneNumber" class="form-control">
+                    <span asp-validation-for="GroupPhoneNumber" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="GroupEmail" class="control-label"></label>
+                    <input asp-for="GroupEmail" class="form-control">
+                    <span asp-validation-for="GroupEmail" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="StateId" class="control-label"></label>
+                    <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="LoadLga();">
+                        <option>--Select State--</option>
+                    </select>
+                    <span asp-validation-for="StateId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 form-group">
+                    <label asp-for="LocalGovernmentAreaId" class="control-label"></label>
+                    <select asp-for="LocalGovernmentAreaId" class="form-control">
+                        <option>--Select LGA--</option>
+                    </select>
+                    <span asp-validation-for="LocalGovernmentAreaId" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-md-12  text-md-center">
+                    @if (Model != null && Model.AssociationId > 0)
+                    {
+                        <input type="submit" value="UPDATE ASSOCIATION" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="ADD ASSOCIATION" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+                    }
+                    <a href="#" class="text-uppercase btn btn-rounded mb-5 btn-warning" data-dismiss="modal">CANCEL</a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+<script>
+    $("#myEditform").submit(function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+            type: "POST",
+            url: "/Associations/Save",
+            data: formData,
+            success: function (data) {
+                if (data.status) {
+                    window.oTable.ajax.reload(); //run my_fun() ondomready
+                    $('#actionsList').modal("hide");
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.warning(data.message);
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+
+    function LoadLga() {
+        var stateId = $("#StateId").val();
+        $.ajax
+            ({
+                url: '/Basic/GetLgaList?stateId=' + stateId,
+                type: 'GET',
+                datatype: 'application/json',
+                contentType: 'application/json',
+                success: function (result) {
+                    $("#LocalGovtId").html("");
+                    $.each($.parseJSON(result),
+                        function (i, city) {
+                            $("#LocalGovernmentAreaId").append($('<option></option>').val(city.ReferenceId).html(city.LgaName));
+                        });
+                },
+                error: function () {
+                    alert("Whooaaa! Something went wrong..");
+                }
+            });
+    }
+
+</script>
