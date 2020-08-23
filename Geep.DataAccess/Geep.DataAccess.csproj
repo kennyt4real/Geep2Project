@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Geep.Common\Geep.Common.csproj" />
     <ProjectReference Include="..\Geep.DomainLayer\Geep.DomainLayer.csproj" />
     <ProjectReference Include="..\Geep.Models\Geep.Models.csproj" />
   </ItemGroup>

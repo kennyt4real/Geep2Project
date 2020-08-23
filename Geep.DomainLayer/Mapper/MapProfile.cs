@@ -14,7 +14,7 @@ namespace Geep.DomainLayer.Mapper
             // Reverse map to be reviewedd
 
 
-            CreateMap<Agent, AgentVm>().ReverseMap();
+            CreateMap<Models.Core.Agent, AgentVm>().ReverseMap();
 
 
             CreateMap<BeneficiaryVm, Beneficiary>();
@@ -55,6 +55,9 @@ namespace Geep.DomainLayer.Mapper
             CreateMap<ClusterLocationVm, ClusterLocation>();
             CreateMap<ClusterLocation, ClusterLocationVm>()
                 .ForMember(x => x.StateName, o => o.MapFrom(source => source.State.StateName));
+
+            CreateMap<BeneficiaryVm, UpdateRecordOnPortalModel>();
         }
+        
     }
 }

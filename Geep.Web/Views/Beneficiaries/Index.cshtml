@@ -18,6 +18,9 @@
                     <div class="col-md-6">
                         <h4>List of Beneficiaries</h4>
                     </div>
+                    <div class="col-md-6 text-right">
+                        <a href="#" onclick="PushRecordsToWhiteList()" class="btn btn-primary">PUSH RECORDS TO WHITELIST</a>
+                    </div>
                 </div>
                 <br />
                 <br />
@@ -56,15 +59,35 @@
             },
             "columns": [
                 { "data": "BeneficiaryFullName", "autoWidth": true },
-                { "data": "PhoneNumber", "autoWidth": true },
-                { "data": "DateEnumerated", "autoWidth": true },
+                { "data": "phone", "autoWidth": true },
+                { "data": "date_enumerated", "autoWidth": true },
                 { "data": "AssociationName", "autoWidth": true },
                 { "data": "AgentName", "autoWidth": true },
             ]
         });
     });
 
-    
+    function PushRecordsToWhiteList() {
+        //var url = "/Beneficiaries/PushRecordsToWhiteList";
+        $.ajax({
+            type: "POST",
+            url: "/Beneficiaries/PushRecordsToWhiteList",
+            "datatype": "json",
+            success: function (data) {
+                if (data.status) {
+                    //window.oTable.ajax.reload(); //run my_fun() ondomready
+                    //$("#myform")[0].reset()
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.warning(data.message);
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
 
     function Edit(associationId) {
         var url = "/Beneficiaries/Save?id=" + associationId;
@@ -74,6 +97,6 @@
             });
     };
 
-   
-  
+
+
 </script>

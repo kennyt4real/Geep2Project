@@ -12,5 +12,7 @@ namespace Geep.DomainLayer.CustomAbstrations
         Task<List<BeneficiaryVm>> GetBeneficiaryByAgentId(int id);
         Task<AgentVm> GetAgentByReferenceId(string id);
         Task<AgentVm> AddAgent(AgentVm vm);
+        Task<AssociationVm> GetAssociationByAssociationName(string groupName);
+        Task PushRecordsToWhiteList();
     }
 }

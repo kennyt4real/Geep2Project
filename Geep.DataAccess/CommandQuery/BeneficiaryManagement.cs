@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Geep.Common.BOIHelpers;
 using Geep.DataAccess.Context;
 using Geep.DomainLayer.CustomAbstrations;
 using Geep.DomainLayer.GeneralAbstractions;
 using Geep.Models.Core;
 using Geep.ViewModels.CoreVm;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,22 +19,24 @@ namespace Geep.DataAccess.CommandQuery
         private IRepo<Beneficiary> _repo;
         private IMapper _mapper;
         private GeepDbContext _db;
+        private ICrudInteger<BeneficiaryVm> _beneficiaryQuery;
 
-        public BeneficiaryManagement(GeepDbContext db, IRepo<Beneficiary> repo, IMapper mapper)
+        public BeneficiaryManagement(GeepDbContext db, IRepo<Beneficiary> repo, IMapper mapper, ICrudInteger<BeneficiaryVm> beneficiaryQuery)
         {
             _repo = repo;
             _mapper = mapper;
             _db = db;
+            _beneficiaryQuery = beneficiaryQuery;
         }
 
         public async Task<List<BeneficiaryVm>> GetBeneficiaryByAssociationId(int id)
         {
-            return _mapper.Map<List<BeneficiaryVm>>(await _repo.GetAllById($"{nameof(Association)},{nameof(Agent)}", x => x.AssociationId.Equals(id)));
+            return _mapper.Map<List<BeneficiaryVm>>(await _repo.GetAllById($"{nameof(Association)},{nameof(Models.Core.Agent)}", x => x.AssociationId.Equals(id)));
         }
 
         public async Task<List<BeneficiaryVm>> GetBeneficiaryByAgentId(int id)
         {
-            return _mapper.Map<List<BeneficiaryVm>>(await _repo.GetAllById($"{nameof(Association)},{nameof(Agent)}", x => x.AgentId.Equals(id)));
+            return _mapper.Map<List<BeneficiaryVm>>(await _repo.GetAllById($"{nameof(Association)},{nameof(Models.Core.Agent)}", x => x.AgentId.Equals(id)));
 
         }
 
@@ -47,7 +51,7 @@ namespace Geep.DataAccess.CommandQuery
         {
             try
             {
-                var model = _mapper.Map<Agent>(vm);
+                var model = _mapper.Map<Models.Core.Agent>(vm);
                 _db.Agents.Add(model);
                 await _db.SaveChangesAsync();
                 return _mapper.Map<AgentVm>(model);
@@ -57,8 +61,63 @@ namespace Geep.DataAccess.CommandQuery
             {
                 throw;
             }
-           
+
         }
 
+        public async Task<AssociationVm> GetAssociationByAssociationName(string groupName)
+        {
+            return _mapper.Map<AssociationVm>(await _db.Associations.AsNoTracking().FirstOrDefaultAsync(x => x.AssociationName.ToUpper().Trim().Equals(groupName.ToUpper().Trim())));
+        }
+
+        public async Task PushRecordsToWhiteList()
+        {
+            var beneficiaries = await _beneficiaryQuery.GetAll();
+            int totalRecordPushed = 0;
+            int approvedRecords = 0;
+            int rejectedRecords = 0;
+            foreach (var beneficiary in beneficiaries)
+            {
+
+                var response = await BOIHelper.PusheToWhiteList(beneficiary);
+                if (response.IsSuccessStatusCode)
+                {
+                    totalRecordPushed = totalRecordPushed + 1;
+                    var json = await response.Content.ReadAsStringAsync();
+                    JObject jobj = JObject.Parse(json);
+                    beneficiary.PushedToWhiteList = true;
+                    beneficiary.DateUpdated = DateTime.UtcNow;
+
+                    if (jobj["status"].ToString() == "200")
+                    {
+                        beneficiary.IsApprovedByWhiteList = true;
+                        beneficiary.ReferenceKey = jobj["data"]["id"].ToString();
+                        approvedRecords = approvedRecords + 1;
+
+                    }
+                    else if (jobj["status"].ToString() == "401")
+                    {
+                        beneficiary.RejectionReason = "Rejected by whitelist for these reasons:" + " " + jobj["message"].ToString();
+                        rejectedRecords = rejectedRecords + 1;
+                    }
+                    else
+                    {
+
+                        if (jobj["data"] == null || jobj["data"]["id"] == null)
+                        {
+                            beneficiary.RejectionReason = "Rejected by whitelist for these reasons:" + " " + jobj["message"].ToString();
+
+                            rejectedRecords = rejectedRecords + 1;
+                        }
+                    }
+                    var updatePortalVm = _mapper.Map<UpdateRecordOnPortalModel>(beneficiary);
+                    var updateOnPortalResponse = await BOIHelper.UpdateRecordOnPortal(updatePortalVm);
+                    var portalRsponseJson = await response.Content.ReadAsStringAsync();
+
+                    await _beneficiaryQuery.AddOrUpdate(beneficiary);
+
+                }
+            }
+        }
     }
 }
+

@@ -29,7 +29,7 @@ namespace Geep.DataAccess.CommandQuery
         public async Task<AgentClusterLocationVm> GetById(int id)
         {
             return _mapper.Map<AgentClusterLocationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x => x.AgentClusterLocationId.Equals(id),
-                                                                        $"{nameof(Agent)},{nameof(ClusterLocation)}"));
+                                                                        $"{nameof(Models.Core.Agent)},{nameof(ClusterLocation)}"));
         }
         public async Task<ResponseVm> AddOrUpdate(AgentClusterLocationVm vm)
         {

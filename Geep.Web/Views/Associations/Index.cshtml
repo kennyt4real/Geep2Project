@@ -130,7 +130,6 @@
    
     $("#myform").submit(function (e) {
         e.preventDefault();
-        alert("Hi");
         var formData = new FormData(this);
         $.ajax({
             type: "POST",

@@ -4,14 +4,16 @@ using Geep.DataAccess.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Geep.DataAccess.Migrations
 {
     [DbContext(typeof(GeepDbContext))]
-    partial class GeepDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200823004204_[DOBToStringOnBeneficiaryModel]")]
+    partial class DOBToStringOnBeneficiaryModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,7 +117,7 @@ namespace Geep.DataAccess.Migrations
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e513",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4c830e1b-ae6d-4970-8351-76ded90f0190",
+                            ConcurrencyStamp = "12da4b8a-5470-4cf9-afa8-cfbb062004f5",
                             Email = "Admin@geepproject.com",
                             EmailConfirmed = true,
                             IsGoogleAuthenticatorEnabled = false,
@@ -124,7 +126,7 @@ namespace Geep.DataAccess.Migrations
                             NormalizedEmail = "ADMIN@GEEPPROJECT.COM",
                             NormalizedUserName = "ADMIN@GEEPPROJECT.COM",
                             NumberOfLogins = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEMmAxsMlnnkHhssxnPgtRTFb1L7mNrtEFSIep4UXjdo8KFsP3Lx+x+OTbPH6VZ2yjA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEEVfh7PK9+6243ZmGElsqtyXhQ8rFLfPf36PoU6gv580M//5eWR6/bqJRmhfdRzj+g==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -134,7 +136,7 @@ namespace Geep.DataAccess.Migrations
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e613",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3c5e31f1-5d7c-45aa-823d-cd2a90d5c20d",
+                            ConcurrencyStamp = "d5196c12-c9bc-45eb-90d3-b495b808c27c",
                             Email = "SuperAdmin@geepproject.com",
                             EmailConfirmed = true,
                             IsGoogleAuthenticatorEnabled = false,
@@ -143,7 +145,7 @@ namespace Geep.DataAccess.Migrations
                             NormalizedEmail = "SUPERADMIN@GEEPPROJECT.COM",
                             NormalizedUserName = "SUPERADMIN@GEEPPROJECT.COM",
                             NumberOfLogins = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEC7K1IC0JXPC2xUGHs5ftdO+W4A16/kwEOM/CY+Zo/JjaDnF4XukkV2NJP99+ZlnEg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEHvtwwD2zJ77ovXS7uXlX/yBFjBwG7A8p2IlaP8bSj79Ub6+GjoOxLKVvhfhf75Svw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -408,12 +410,6 @@ namespace Geep.DataAccess.Migrations
                     b.Property<string>("IdCardNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsApprovedByWhiteList")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsUpdatedOnPortal")
-                        .HasColumnType("bit");
-
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
@@ -436,17 +432,8 @@ namespace Geep.DataAccess.Migrations
                     b.Property<string>("Picture")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("PushedToWhiteList")
-                        .HasColumnType("bit");
-
                     b.Property<int>("ReferenceId")
                         .HasColumnType("int");
-
-                    b.Property<string>("ReferenceKey")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RejectionReason")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SmileIdZip")
                         .HasColumnType("nvarchar(max)");
@@ -622,21 +609,21 @@ namespace Geep.DataAccess.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e513",
-                            ConcurrencyStamp = "0b985797-5e31-4652-b85b-1d8f16d6f4a1",
+                            ConcurrencyStamp = "645672ea-5a18-46f0-80ee-69ae5a9e2b5a",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e613",
-                            ConcurrencyStamp = "ab638a4d-4050-455a-b711-1ecfcf5b1fdf",
+                            ConcurrencyStamp = "ea4544bf-28af-4a65-8207-1f3b9d54267e",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "a18be9c0-aak5-4af8-bd17-00bd934nfn13",
-                            ConcurrencyStamp = "444b9763-03f2-4295-b1c4-77ba12ba2abd",
+                            ConcurrencyStamp = "f1bfb2e0-9c4d-42c4-8f39-9097adcd2be4",
                             Name = "QualityControl",
                             NormalizedName = "QUALITYCONTROL"
                         });

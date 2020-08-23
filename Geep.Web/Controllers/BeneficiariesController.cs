@@ -73,6 +73,13 @@ namespace Geep.Web.Controllers
             return Json(new { data });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> PushRecordsToWhiteList()
+        {
+            await _beneficiaryQuery.PushRecordsToWhiteList();
+            return Json(new {status = true, message = "Pushing Records to WhiteList in progress...Will notify you via a mail at the end of the task!!!" });
+        }
+
         public async Task<IActionResult> Save(int id)
         {
             var model = await _repo.GetById(id);

@@ -12,10 +12,10 @@ namespace Geep.DataAccess.CommandQuery
 {
     public class AgentCQ : ICrudInteger<AgentVm>
     {
-        private readonly IRepo<Agent> _repo;
+        private readonly IRepo<Models.Core.Agent> _repo;
         private readonly IMapper _mapper;
         private readonly IUserContext _userContext;
-        public AgentCQ(IRepo<Agent> repo, IMapper mapper)
+        public AgentCQ(IRepo<Models.Core.Agent> repo, IMapper mapper)
         {
             _repo = repo;
             _mapper = mapper;
@@ -32,7 +32,7 @@ namespace Geep.DataAccess.CommandQuery
         }
         public async  Task<ResponseVm> AddOrUpdate(AgentVm vm)
         {
-            var model = _mapper.Map<Agent>(vm);
+            var model = _mapper.Map<Models.Core.Agent>(vm);
 
             if (model.AgentId > 0)
             {

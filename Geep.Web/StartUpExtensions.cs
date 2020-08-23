@@ -8,9 +8,11 @@ using Geep.DomainLayer.Mapper;
 using Geep.ViewModels;
 using Geep.ViewModels.CoreVm;
 using Geep.Web.Services;
+using Geep.Web.Swagger;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,8 +68,16 @@ namespace Geep.Web
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "GEEP2 Dashboard", Version = "v1" });
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                { 
+                    Title = "GEEP2 Dashboard", 
+                    Version = "v1" 
+                });
+                //c.SchemaFilter<SchemaFilter>();
+                //c.OperationFilter<HeaderFilter>();
             });
+
+            services.AddSwaggerGenNewtonsoftSupport();
 
             services.AddMvc()
                  .AddJsonOptions(o =>

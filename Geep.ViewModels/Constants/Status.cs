@@ -9,9 +9,10 @@ namespace Geep.ViewModels.Constants
         public enum Status
         {
             Submitted,
+            Rejected,
             Approved,
-            Invalidated, 
-            Rejected
+            Invalidated,
+            Deleted
         }
     }
 }
