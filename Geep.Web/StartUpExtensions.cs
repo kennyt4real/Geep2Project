@@ -28,9 +28,10 @@ namespace Geep.Web
             #region[Reading PasswordGenSetting from appsetting.json]
             services.Configure<PasswordGenSetting>(configuration.GetSection("PasswordGenParam"));
             #endregion
+            services.AddSingleton<IEmailSender>(x => new EmailSender(configuration.GetValue<string>("SenGridApiKey:ApiKey")));
 
 
-            //services.AddScoped(typeof(IPasswordGenerator), typeof(PasswordGenerator));
+            services.AddScoped(typeof(IPasswordGenerator), typeof(PasswordGenerator));
             services.AddScoped(typeof(IRepo<>), typeof(Repo<>));
             services.AddScoped(typeof(IUserContext), typeof(UserContext));
             services.AddScoped(typeof(ICrudInteger<AgentVm>), typeof(AgentCQ));

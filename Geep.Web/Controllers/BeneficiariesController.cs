@@ -10,9 +10,12 @@ using Geep.Models.Core;
 using Geep.ViewModels.CoreVm;
 using Geep.DomainLayer.GeneralAbstractions;
 using Geep.DomainLayer.CustomAbstrations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Geep.Web.Controllers
 {
+    [Authorize]
+
     public class BeneficiariesController : Controller
     {
         private ICrudInteger<BeneficiaryVm> _repo;

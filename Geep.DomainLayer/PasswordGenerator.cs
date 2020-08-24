@@ -1,4 +1,5 @@
-﻿using Geep.ViewModels;
+﻿using Geep.DomainLayer.CustomAbstrations;
+using Geep.ViewModels;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace Geep.DomainLayer
 {
-    public class PasswordGenerator
+    public class PasswordGenerator : IPasswordGenerator
     {
         public IOptions<PasswordGenSetting> _passwordGenSettings { get; }
 

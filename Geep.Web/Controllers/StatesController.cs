@@ -9,9 +9,12 @@ using Geep.DataAccess.Context;
 using Geep.Models.Core;
 using Geep.DomainLayer.GeneralAbstractions;
 using Geep.ViewModels.CoreVm;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Geep.Web.Controllers
 {
+    [Authorize]
+
     public class StatesController : Controller
     {
         private ICrudInteger<StateVm> _repo;

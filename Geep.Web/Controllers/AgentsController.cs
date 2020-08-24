@@ -10,9 +10,12 @@ using Geep.Models.Core;
 using Geep.DomainLayer.GeneralAbstractions;
 using Geep.ViewModels.CoreVm;
 using static Geep.ViewModels.Constants.PopUp;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Geep.Web.Controllers
 {
+    [Authorize]
+
     public class AgentsController : Controller
     {
         private ICrudInteger<AgentVm> _repo;

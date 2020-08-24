@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -125,30 +133,34 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="profileDropdown">
                                 <div class="dropdown-header d-flex flex-column align-items-center">
-                                    <div class="figure mb-3">
+                                    @*<div class="figure mb-3">
                                         <img src="~/assets/images/faces/face1.jpg" alt="">
-                                    </div>
+                                    </div>*@
                                     <div class="info text-center">
-                                        <p class="name font-weight-bold mb-0">Amiah Burton</p>
-                                        <p class="email text-muted mb-3">amiahburton@gmail.com</p>
+                                        @if (SignInManager.IsSignedIn(User))
+                                        {
+                                            <p class="name font-weight-bold mb-0">@user.FirstName @user.LastName</p>
+                                            <p class="email text-muted mb-3">@user.Email</p>
+                                        }
+
                                     </div>
                                 </div>
                                 <div class="dropdown-body">
                                     <ul class="profile-nav p-0 pt-3">
+                                        @*<li class="nav-item">
+                                                <a href="pages/general/profile.html" class="nav-link">
+                                                    <i data-feather="user"></i>
+                                                    <span>Profile</span>
+                                                </a>
+                                            </li>*@
+                                        @*<li class="nav-item">
+                                                <a href="javascript:;" class="nav-link">
+                                                    <i data-feather="edit"></i>
+                                                    <span>Edit Profile</span>
+                                                </a>
+                                            </li>*@
                                         <li class="nav-item">
-                                            <a href="pages/general/profile.html" class="nav-link">
-                                                <i data-feather="user"></i>
-                                                <span>Profile</span>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="javascript:;" class="nav-link">
-                                                <i data-feather="edit"></i>
-                                                <span>Edit Profile</span>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="javascript:;" class="nav-link">
+                                            <a asp-area="Identity" asp-page="/Account/Login" class="nav-link">
                                                 <i data-feather="log-out"></i>
                                                 <span>Log Out</span>
                                             </a>

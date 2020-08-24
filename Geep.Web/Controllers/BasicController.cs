@@ -4,11 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Geep.DomainLayer.GeneralAbstractions;
 using Geep.ViewModels.CoreVm;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Geep.Web.Controllers
 {
+    [Authorize]
+
     public class BasicController : Controller
     {
         private readonly ICrudInteger<LocalGovernmentAreaVm> _query;

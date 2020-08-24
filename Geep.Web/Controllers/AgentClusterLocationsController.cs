@@ -9,9 +9,11 @@ using Geep.DataAccess.Context;
 using Geep.Models.Core;
 using Geep.ViewModels.CoreVm;
 using Geep.DomainLayer.GeneralAbstractions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Geep.Web.Controllers
 {
+    [Authorize]
     public class AgentClusterLocationsController : Controller
     {
         private ICrudInteger<AgentClusterLocationVm> _repo;

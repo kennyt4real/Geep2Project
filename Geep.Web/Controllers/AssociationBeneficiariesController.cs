@@ -9,9 +9,12 @@ using Geep.DataAccess.Context;
 using Geep.Models.Core;
 using Geep.ViewModels.CoreVm;
 using Geep.DomainLayer.GeneralAbstractions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Geep.Web.Controllers
 {
+    [Authorize]
+
     public class AssociationBeneficiariesController : Controller
     {
         private ICrudInteger<AssociationBeneficiaryVm> _repo;
