@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Geep.Models.Core
@@ -51,5 +52,8 @@ namespace Geep.Models.Core
         public string RejectionReason { get; set; }
         public string ReferenceKey { get; set; }
         public bool IsUpdatedOnPortal { get; set; }
+        public int NumberOfEmployees { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalValueOfCurrentBusiness { get; set; }
     }
 }

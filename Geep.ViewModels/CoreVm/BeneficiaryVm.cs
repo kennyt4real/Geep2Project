@@ -112,6 +112,12 @@ namespace Geep.ViewModels.CoreVm
         public string AgentName { get; set; }
         public string AgentRefId { get; set; }
         public string AssociationName { get; set; }
+
+        [JsonPropertyName("number_of_employees")]
+        public int NumberOfEmployees { get; set; }
+
+        [JsonPropertyName("total_value_of_current_business")]
+        public decimal TotalValueOfCurrentBusiness { get; set; }
         public string BeneficiaryFullName => $"{LastName} {FirstName} {MiddleName}";
 
         [JsonPropertyName("agent")]
@@ -122,5 +128,34 @@ namespace Geep.ViewModels.CoreVm
         public string RejectionReason { get; set; }
         public string ReferenceKey { get; set; }
         public bool IsUpdatedOnPortal { get; set; }
+        public string DisplayForIsPushedToWhiteList
+        {
+            get
+            {
+                if (PushedToWhiteList)
+                    return "True";
+                return "False";
+            }
+        }
+        public string DisplayForIsApprovedByWhiteList
+        {
+            get
+            {
+                if (IsApprovedByWhiteList)
+                    return "Approved";
+                if(PushedToWhiteList)
+                    return "Rejected";
+                return "Submitted";
+            }
+        }
+        public string DisplayForIsUpdatedOnPortal
+        {
+            get
+            {
+                if (IsUpdatedOnPortal)
+                    return "True";
+                return "False";
+            }
+        }
     }
 }

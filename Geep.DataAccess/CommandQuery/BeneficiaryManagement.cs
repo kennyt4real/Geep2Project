@@ -4,11 +4,14 @@ using Geep.DataAccess.Context;
 using Geep.DomainLayer.CustomAbstrations;
 using Geep.DomainLayer.GeneralAbstractions;
 using Geep.Models.Core;
+using Geep.ViewModels;
 using Geep.ViewModels.CoreVm;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -71,7 +74,7 @@ namespace Geep.DataAccess.CommandQuery
 
         public async Task PushRecordsToWhiteList()
         {
-            var beneficiaries = await _beneficiaryQuery.GetAll();
+            var beneficiaries = _mapper.Map<List<BeneficiaryVm>>(await _db.Beneficiaries.Include(x=>x.Agent).Include(x=>x.Association).AsNoTracking().Where(x=>x.IsApprovedByWhiteList.Equals(false)).ToListAsync());
             int totalRecordPushed = 0;
             int approvedRecords = 0;
             int rejectedRecords = 0;
@@ -111,7 +114,10 @@ namespace Geep.DataAccess.CommandQuery
                     }
                     var updatePortalVm = _mapper.Map<UpdateRecordOnPortalModel>(beneficiary);
                     var updateOnPortalResponse = await BOIHelper.UpdateRecordOnPortal(updatePortalVm);
-                    var portalRsponseJson = await response.Content.ReadAsStringAsync();
+                    var portalResponseJson = await updateOnPortalResponse.Content.ReadAsStringAsync();
+                    var portalResponseModel = JsonConvert.DeserializeObject<PortalResponseVm>(portalResponseJson);
+                    if (portalResponseModel.Data)
+                        beneficiary.IsUpdatedOnPortal = true;
 
                     await _beneficiaryQuery.AddOrUpdate(beneficiary);
 

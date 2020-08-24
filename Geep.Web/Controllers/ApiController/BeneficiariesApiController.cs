@@ -37,7 +37,7 @@ namespace Geep.Web.Controllers.ApiController
                 var agent = await _beneficiaryQuery.GetAgentByReferenceId(vm.Agent.ReferenceId);
                 if (agent == null)
                 {
-                    //agent = await _beneficiaryQuery.AddAgent(vm.Agent);
+                    agent = await _beneficiaryQuery.AddAgent(vm.Agent);
                     if (agent == null)
                     {
                         return BadRequest(new ResponseVm { Status=false, Message = "Agent Not found and Agent creation failed" });
@@ -46,11 +46,11 @@ namespace Geep.Web.Controllers.ApiController
                 if (vm.GroupName != null)
                 {
                     var association = await _beneficiaryQuery.GetAssociationByAssociationName(vm.GroupName);
-                    if (association == null)
+                    if (association != null)
                     {
-                        return BadRequest(new ResponseVm {Status = false, Message = "Association not found" });
+                        vm.AssociationId = association.AssociationId;
+                        //return BadRequest(new ResponseVm {Status = false, Message = "Association not found" });
                     }
-                    vm.AssociationId = association.AssociationId;
                 }
                 vm.AgentId = agent.AgentId;
                 vm.Agent = null;
