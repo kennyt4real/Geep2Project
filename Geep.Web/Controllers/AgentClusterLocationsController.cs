@@ -10,6 +10,8 @@ using Geep.Models.Core;
 using Geep.ViewModels.CoreVm;
 using Geep.DomainLayer.GeneralAbstractions;
 using Microsoft.AspNetCore.Authorization;
+using Geep.DomainLayer.CustomAbstrations;
+using Newtonsoft.Json;
 
 namespace Geep.Web.Controllers
 {
@@ -20,20 +22,27 @@ namespace Geep.Web.Controllers
         private ICrudInteger<StateVm> _stateQuery;
         private readonly ICrudInteger<AgentVm> _agentQuery;
         private readonly ICrudInteger<ClusterLocationVm> _clusterQuery;
+        private readonly IBeneficiaryManagement _beneficiaryQuery;
 
-        public AgentClusterLocationsController(ICrudInteger<AgentClusterLocationVm> repo, ICrudInteger<StateVm> stateQuery, 
+        public AgentClusterLocationsController(ICrudInteger<AgentClusterLocationVm> repo, ICrudInteger<StateVm> stateQuery, IBeneficiaryManagement beneficiaryQuery, 
                                             ICrudInteger<AgentVm> agentQuery, ICrudInteger<ClusterLocationVm> clusterQuery )
         {
             _repo = repo;
             _stateQuery = stateQuery;
             _agentQuery = agentQuery;
             _clusterQuery = clusterQuery;
+            _beneficiaryQuery = beneficiaryQuery;
         }
 
         public async  Task<IActionResult> Index()
         {
+            //ViewData["RoleName"] = new MultiSelectList(selectRole, "Name", "Name");
+            var agents = await _beneficiaryQuery.GetGeepAgents();
+            var agentsEmails = agents.Select(s => new { Name = s.Email }).ToList();
+
+
             ViewData["StateId"] = new SelectList(await _stateQuery.GetAll(), "StateId", "StateName");
-            ViewData["AgentId"] = new SelectList(await _agentQuery.GetAll(), "AgentId", "AgentFullName");
+            ViewData["AgentId"] = new MultiSelectList(agentsEmails, "Name", "Name");
             return View();
         }
 

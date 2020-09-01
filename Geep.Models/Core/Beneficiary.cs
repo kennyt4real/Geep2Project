@@ -9,6 +9,7 @@ namespace Geep.Models.Core
     public class Beneficiary : Audit
     {
         public int BeneficiaryId { get; set; }
+        [UniqueKey]
         public int ReferenceId { get; set; }
         public int ClusterLocationId { get; set; }
         public int TreadeTypeId { get; set; }

@@ -18,6 +18,11 @@ namespace Geep.ViewModels.CoreVm
         [Required]
         [DisplayName("State")]
         public int StateId { get; set; }
+
+        [Required]
+        [DisplayName("Email(s)")]
+        public string[] AgentEmails { get; set; }
+
         public string AgentName { get; set; }
         public string AgentRefId { get; set; }
         public string ClusterName { get; set; }

@@ -1,4 +1,5 @@
 ﻿using Geep.Models.Core;
+using Geep.ViewModels.Constants;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -316,6 +317,31 @@ namespace Geep.DataAccess.Context
                     StateName = "Zamfara"
                 });
 
+                context.SaveChanges();
+            }
+            if (!context.LocalGovernmentAreas.Any())
+            {
+                var getLgaList = LgaList.PopulateLga();
+
+                var states = context.States.ToList();
+
+                foreach (var state in states)
+                {
+                    var lgas = getLgaList[state.StateName.ToUpper()];
+                    foreach (var lga in lgas)
+                    {
+                        context.LocalGovernmentAreas.Add(new LocalGovernmentArea()
+                        {
+                            CreatedBy = "System",
+                            DateCreated = DateTime.Now,
+                            DateUpdated = DateTime.Now,
+                            StateId = state.StateId,
+                            LgaName = lga.LgaName,
+                            ReferenceId=lga.ReferenceId
+                        });
+                    }
+
+                }
                 context.SaveChanges();
             }
         }

@@ -16,16 +16,18 @@ namespace Geep.Web.Controllers.ApiController
     [Produces("application/json")]
     public class BeneficiariesApiController : ControllerBase
     {
-        private ICrudInteger<BeneficiaryVm> _beneficiaryRepo;
         private ICrudInteger<AgentVm> _agentRepo;
         private IBeneficiaryManagement _beneficiaryQuery;
+        private ICrudInteger<AssociationBeneficiaryVm> _assoBenQuery;
+        private ICrudInteger<ClusterLocationVm> _clusterQuery;
 
-        public BeneficiariesApiController(ICrudInteger<BeneficiaryVm> beneficiaryRepo, ICrudInteger<AgentVm> agentRepo,
-                                            IBeneficiaryManagement beneficiaryQuery)
+        public BeneficiariesApiController(ICrudInteger<AgentVm> agentRepo, ICrudInteger<AssociationBeneficiaryVm> assoBenQuery,IBeneficiaryManagement beneficiaryQuery,
+            ICrudInteger<ClusterLocationVm> clusterQuery)
         {
-            _beneficiaryRepo = beneficiaryRepo;
             _agentRepo = agentRepo;
             _beneficiaryQuery = beneficiaryQuery;
+            _assoBenQuery = assoBenQuery;
+            _clusterQuery = clusterQuery;
         }
 
         // POST: api/Beneficiary
@@ -34,6 +36,7 @@ namespace Geep.Web.Controllers.ApiController
         {
             if (ModelState.IsValid)
             {
+                int associationId = 0;
                 var agent = await _beneficiaryQuery.GetAgentByReferenceId(vm.Agent.ReferenceId);
                 if (agent == null)
                 {
@@ -49,22 +52,30 @@ namespace Geep.Web.Controllers.ApiController
                     if (association != null)
                     {
                         vm.AssociationId = association.AssociationId;
+                        associationId = association.AssociationId;
                         //return BadRequest(new ResponseVm {Status = false, Message = "Association not found" });
                     }
                 }
+                var clusterLocation = await _clusterQuery.GetByReferenceId(vm.ClusterLocationId);
+                vm.ClusterLocationId = clusterLocation.ClusterLocationId;
                 vm.AgentId = agent.AgentId;
                 vm.Agent = null;
 
 
-                var response = await _beneficiaryRepo.AddOrUpdate(vm);
-                if (response.Status)
+                var response = await _beneficiaryQuery.AddBeneficiary(vm);
+                if (response.beneficiaryId > 0) 
                 {
+                    if (associationId > 0)
+                    {
+                        var associationBeneficiary = new AssociationBeneficiaryVm { AssociationId = associationId, BeneficiaryId = response.beneficiaryId };
+                        await _assoBenQuery.AddOrUpdate(associationBeneficiary);
+                    } 
                     return Ok(new ResponseVm { Status = true, Message = "Record created successfull" });
                 }
-                return BadRequest(new ResponseVm { Status = false, Message = $"Record creation failed {response.Message}" });
+                return BadRequest(new ResponseVm { Status = false, Message = $"Record creation failed.Reasons:{response.message}" });
 
             }
-            return BadRequest(new ResponseVm {Status= false, Message = "Record creation failed" });
+            return BadRequest(new ResponseVm {Status= false, Message = "Some responses are not Valid" });
 
         }
     }

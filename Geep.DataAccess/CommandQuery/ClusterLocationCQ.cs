@@ -35,6 +35,12 @@ namespace Geep.DataAccess.CommandQuery
         {
             return _mapper.Map<ClusterLocationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x=>x.ClusterLocationId.Equals(id),$"{nameof(State)}"));
         }
+
+        public async Task<ClusterLocationVm> GetByReferenceId(int refId)
+        {
+            return _mapper.Map<ClusterLocationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x => x.ReferenceId.Equals(refId), ""));
+        }
+
         public async Task<ResponseVm> AddOrUpdate(ClusterLocationVm vm)
         {
             var model = _mapper.Map<ClusterLocation>(vm);
@@ -56,5 +62,6 @@ namespace Geep.DataAccess.CommandQuery
 
         }
 
+      
     }
 }

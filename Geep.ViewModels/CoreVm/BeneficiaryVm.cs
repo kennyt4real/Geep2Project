@@ -123,6 +123,7 @@ namespace Geep.ViewModels.CoreVm
         [JsonPropertyName("agent")]
         public AgentVm  Agent { get; set; }
         public AssociationVm  Association { get; set; }
+        public ClusterLocationVm ClusterLocationVm { get; set; }
         public bool PushedToWhiteList { get; set; }
         public bool IsApprovedByWhiteList { get; set; }
         public string RejectionReason { get; set; }

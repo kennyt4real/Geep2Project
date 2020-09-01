@@ -28,6 +28,12 @@ namespace Geep.DataAccess.CommandQuery
         {
             return _mapper.Map<StateVm>(await _repo.GetById(id));
         }
+
+        public async Task<StateVm> GetByReferenceId(int refId)
+        {
+            return _mapper.Map<StateVm>(await _repo.GetFirstOrDeafultWithNoTracking(x => x.ReferenceId.Equals(refId), ""));
+        }
+
         public async Task<ResponseVm> AddOrUpdate(StateVm vm)
         {
             var model = _mapper.Map<State>(vm);
@@ -53,5 +59,7 @@ namespace Geep.DataAccess.CommandQuery
         {
             throw new System.NotImplementedException();
         }
+
+       
     }
 }

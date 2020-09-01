@@ -8,15 +8,10 @@ using Geep.DomainLayer.Mapper;
 using Geep.ViewModels;
 using Geep.ViewModels.CoreVm;
 using Geep.Web.Services;
-using Geep.Web.Swagger;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace Geep.Web
 {

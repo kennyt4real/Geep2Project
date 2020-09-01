@@ -12,10 +12,9 @@ namespace Geep.DataAccess.CommandQuery
 {
     public class AgentCQ : ICrudInteger<AgentVm>
     {
-        private readonly IRepo<Models.Core.Agent> _repo;
+        private readonly IRepo<Agent> _repo;
         private readonly IMapper _mapper;
-        private readonly IUserContext _userContext;
-        public AgentCQ(IRepo<Models.Core.Agent> repo, IMapper mapper)
+        public AgentCQ(IRepo<Agent> repo, IMapper mapper)
         {
             _repo = repo;
             _mapper = mapper;
@@ -54,6 +53,11 @@ namespace Geep.DataAccess.CommandQuery
         public async Task<List<AgentVm>> GetAllById(int id)
         {
             return _mapper.Map<List<AgentVm>>(await _repo.GetAllById("", x => x.LocalGovtRefId.Equals(id)));
+        }
+
+        public Task<AgentVm> GetByReferenceId(int refId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -35,7 +35,11 @@ namespace Geep.DataAccess.CommandQuery
                                         $"{nameof(State)}"));
         }
 
-       
+        public async Task<LocalGovernmentAreaVm> GetByReferenceId(int refId)
+        {
+            return _mapper.Map<LocalGovernmentAreaVm>(await _repo.GetFirstOrDeafultWithNoTracking(x => x.ReferenceId.Equals(refId), ""));
+        }
+
         public async Task<ResponseVm> AddOrUpdate(LocalGovernmentAreaVm vm)
         {
             var model = _mapper.Map<LocalGovernmentArea>(vm);
@@ -59,5 +63,6 @@ namespace Geep.DataAccess.CommandQuery
 
         }
 
+       
     }
 }

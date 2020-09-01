@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Geep.Models.Core;
+using Geep.ViewModels;
 using Geep.ViewModels.CoreVm;
 using System;
 using System.Collections.Generic;
@@ -48,8 +49,8 @@ namespace Geep.DomainLayer.Mapper
 
             CreateMap<AssociationBeneficiaryVm, AssociationBeneficiary>();
             CreateMap<AssociationBeneficiary, AssociationBeneficiaryVm>()
-                .ForMember(x => x.BeneficiaryFullName, o => o.MapFrom(x => x.Beneficiary.BeneficiaryFullName))
-                .ForMember(x => x.AssociationName, o => o.MapFrom(x => x.Association.AssociationName));
+                .ForMember(x => x.BeneficiaryFullName, o => o.MapFrom(source => source.Beneficiary.BeneficiaryFullName))
+                .ForMember(x => x.AssociationName, o => o.MapFrom(source => source.Association.AssociationName));
 
 
             CreateMap<ClusterLocationVm, ClusterLocation>();
@@ -57,6 +58,8 @@ namespace Geep.DomainLayer.Mapper
                 .ForMember(x => x.StateName, o => o.MapFrom(source => source.State.StateName));
 
             CreateMap<BeneficiaryVm, UpdateRecordOnPortalModel>();
+
+            CreateMap<BeneficiaryVm, BOIFields>();
         }
         
     }

@@ -4,6 +4,7 @@
     ViewData["Title"] = "Agent Cluster";
 }
 
+
 <nav class="page-breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="AdminDashboard">Dashboard</a></li>
@@ -30,13 +31,33 @@
                             <span asp-validation-for="StateId" class="text-danger"></span>
                         </div>
 
-                        <div class="col-md-12 form-group">
-                            <label asp-for="AgentId" class="control-label"></label>
-                            <select asp-for="AgentId" class="form-control" asp-items="ViewBag.AgentId">
-                                <option>--Select Agent--</option>
+                        @*<div class="col-md-12 form-group">
+            <label asp-for="AgentId" class="control-label"></label>
+            <select asp-for="AgentId" class="form-control" asp-items="ViewBag.AgentId">
+                <option>--Select Agent--</option>
+            </select>
+            <span asp-validation-for="AgentId" class="text-danger"></span>
+        </div>*@
+                        @*<div class="col-md-12 form-group">
+                            <label>Multiple select using select 2</label>
+                            <select class="js-example-basic-multiple" multiple="multiple" data-width="100%">
+                                <option value="TX">Texas</option>
+                                <option value="WY">Wyoming</option>
+                                <option value="NY">New York</option>
+                                <option value="FL">Florida</option>
+                                <option value="KN">Kansas</option>
+                                <option value="HW">Hawaii</option>
                             </select>
-                            <span asp-validation-for="AgentId" class="text-danger"></span>
+                        </div>*@
+
+                        <div class="col-md-12 form-group">
+                            <label asp-for="AgentEmails" class="control-label"></label>
+                            <select asp-for="AgentEmails" class="js-example-basic-multiple form-control" multiple="multiple" asp-items="ViewBag.AgentId">
+                                <option value="">--Select Email(s)--</option>
+                            </select>
+                            <span asp-validation-for="AgentEmails" class="text-danger"></span>
                         </div>
+
 
                         <div class="col-md-12 form-group">
                             <label asp-for="ClusterLocationId" class="control-label"></label>
@@ -88,12 +109,16 @@
     </div>
 </div>
 
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 
+
+
 <script type="text/javascript">
     $(document).ready(function () {
+        $('.js-example-basic-multiple').select2();
         window.oTable = $('#Jdatatable').DataTable({
             destroy: true,
             "processing": true,
@@ -208,3 +233,4 @@
     }
 
 </script>
+

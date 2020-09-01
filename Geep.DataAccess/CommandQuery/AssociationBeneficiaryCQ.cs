@@ -54,5 +54,10 @@ namespace Geep.DataAccess.CommandQuery
         {
             throw new System.NotImplementedException();
         }
+
+        public Task<AssociationBeneficiaryVm> GetByReferenceId(int refId)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

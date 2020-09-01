@@ -4,8 +4,8 @@
 
 @{
     var user = await UserManager.GetUserAsync(User);
-}
 
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,6 +33,11 @@
     <link rel="stylesheet" href="~/assets/css/demo_1/style.css">
     <!-- End layout styles -->
     <link rel="shortcut icon" href="~/assets/images/favicon.png" />
+
+    <link href="~/assets/vendors/select2/select2.min.css" rel="stylesheet" type="text/css" />
+
+
+    @RenderSection("Styles", false)
 </head>
 <body class="sidebar-dark">
 
@@ -77,12 +82,12 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    @*<li class="nav-item">
                         <a class="nav-link" asp-controller="AgentClusterLocations" asp-action="Index">
                             <i class="link-icon" data-feather="feather"></i>
                             <span class="link-title">Agent Cluster</span>
                         </a>
-                    </li>
+                    </li>*@
 
                     <li class="nav-item">
                         <a asp-action="Index" asp-controller="States" class="nav-link">
@@ -134,13 +139,14 @@
                             <div class="dropdown-menu" aria-labelledby="profileDropdown">
                                 <div class="dropdown-header d-flex flex-column align-items-center">
                                     @*<div class="figure mb-3">
-                                        <img src="~/assets/images/faces/face1.jpg" alt="">
-                                    </div>*@
+                                            <img src="~/assets/images/faces/face1.jpg" alt="">
+                                        </div>*@
                                     <div class="info text-center">
                                         @if (SignInManager.IsSignedIn(User))
                                         {
-                                            <p class="name font-weight-bold mb-0">@user.FirstName @user.LastName</p>
-                                            <p class="email text-muted mb-3">@user.Email</p>
+
+                                            <p class="name font-weight-bold mb-0">@user?.FirstName @user?.LastName</p>
+                                            <p class="email text-muted mb-3">@user?.Email</p>
                                         }
 
                                     </div>
@@ -244,6 +250,8 @@
     @*<script src="~/lib/jquery/dist/jquery.min.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>*@
+    <script src="~/assets/vendors/select2/dist/js/select2.min.js"></script>
+    <script src="~/assets/vendors/select2/select2.min.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

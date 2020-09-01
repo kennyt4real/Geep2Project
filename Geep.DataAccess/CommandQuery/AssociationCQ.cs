@@ -26,9 +26,14 @@ namespace Geep.DataAccess.CommandQuery
 
         public async Task<AssociationVm> GetById(int id)
         {
-            return _mapper.Map<AssociationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x=>x.AssociationId.Equals(id),
+            return _mapper.Map<AssociationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x => x.AssociationId.Equals(id),
                                                         $"{nameof(LocalGovernmentArea)}.{nameof(State)}"));
         }
+        public async Task<AssociationVm> GetByReferenceId(int refId)
+        {
+            return _mapper.Map<AssociationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x => x.AssociationRefId.Equals(refId), ""));
+        }
+
         public async Task<ResponseVm> AddOrUpdate(AssociationVm vm)
         {
             var model = _mapper.Map<Association>(vm);
@@ -54,5 +59,7 @@ namespace Geep.DataAccess.CommandQuery
         {
             throw new System.NotImplementedException();
         }
+
+
     }
 }

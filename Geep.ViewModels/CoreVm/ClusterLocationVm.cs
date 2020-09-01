@@ -18,5 +18,6 @@ namespace Geep.ViewModels.CoreVm
         [DisplayName("Reference ID")]
         public int ReferenceId { get; set; }
         public string StateName { get; set; }
+        public StateVm State { get; set; }
     }
 }

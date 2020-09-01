@@ -29,8 +29,14 @@ namespace Geep.DataAccess.CommandQuery
         public async Task<AgentClusterLocationVm> GetById(int id)
         {
             return _mapper.Map<AgentClusterLocationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x => x.AgentClusterLocationId.Equals(id),
-                                                                        $"{nameof(Models.Core.Agent)},{nameof(ClusterLocation)}"));
+                                                                        $"{nameof(Agent)},{nameof(ClusterLocation)}"));
         }
+
+        public Task<AgentClusterLocationVm> GetByReferenceId(int refId)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public async Task<ResponseVm> AddOrUpdate(AgentClusterLocationVm vm)
         {
             var model = _mapper.Map<AgentClusterLocation>(vm);
@@ -56,5 +62,7 @@ namespace Geep.DataAccess.CommandQuery
         {
             throw new System.NotImplementedException();
         }
+
+       
     }
 }

@@ -1,4 +1,5 @@
-﻿using Geep.ViewModels.CoreVm;
+﻿using Geep.ViewModels;
+using Geep.ViewModels.CoreVm;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,5 +15,8 @@ namespace Geep.DomainLayer.CustomAbstrations
         Task<AgentVm> AddAgent(AgentVm vm);
         Task<AssociationVm> GetAssociationByAssociationName(string groupName);
         Task PushRecordsToWhiteList();
+        Task<(int beneficiaryId, string message)> AddBeneficiary(BeneficiaryVm vm);
+        Task<List<GeepAgent>> GetGeepAgents();
+
     }
 }

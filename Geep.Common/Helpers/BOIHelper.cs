@@ -1,4 +1,5 @@
-﻿using Geep.ViewModels.CoreVm;
+﻿using Geep.ViewModels;
+using Geep.ViewModels.CoreVm;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -7,7 +8,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Geep.Common.BOIHelpers
+namespace Geep.Common.Helpers
 {
     public static class BOIHelper
     {
@@ -24,7 +25,7 @@ namespace Geep.Common.BOIHelpers
             }
         }
         private static HttpClient _client;
-        public static async Task<HttpResponseMessage> PusheToWhiteList(BeneficiaryVm boiFields)
+        public static async Task<HttpResponseMessage> PusheToWhiteList(BOIFields boiFields)
         {
             _client = null;
 
@@ -52,5 +53,18 @@ namespace Geep.Common.BOIHelpers
             return await Client.PutAsJsonAsync("api/record/dashboardupdaterecord", model);
 
         }
+        public static async Task<HttpResponseMessage> GetGeepTeamUsers()
+        {
+            _client = null;
+
+            Client.BaseAddress = new Uri("http://localhost:5000/");
+            //Client.BaseAddress = new Uri("https://dev.cforce.live/");
+            Client.DefaultRequestHeaders.Accept.Clear();
+            Client.DefaultRequestHeaders.Add("X-Tenant-Id", "-306299295");
+
+            return await Client.GetAsync("api/team/getteamusersfordashboard");
+
+        }
+
     }
 }

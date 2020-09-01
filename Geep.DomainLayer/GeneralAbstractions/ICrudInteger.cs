@@ -11,6 +11,7 @@ namespace Geep.DomainLayer.GeneralAbstractions
         Task<List<T>> GetAll();
         Task<List<T>> GetAllById(int id);
         Task<T> GetById(int id);
+        Task<T> GetByReferenceId(int refId);
         Task<ResponseVm> AddOrUpdate(T t);
         Task<ResponseVm> Delete(int id);
     }
