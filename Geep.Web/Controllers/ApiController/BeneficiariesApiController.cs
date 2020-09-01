@@ -20,14 +20,16 @@ namespace Geep.Web.Controllers.ApiController
         private IBeneficiaryManagement _beneficiaryQuery;
         private ICrudInteger<AssociationBeneficiaryVm> _assoBenQuery;
         private ICrudInteger<ClusterLocationVm> _clusterQuery;
+        private ICrudInteger<BeneficiaryVm> _repo;
 
         public BeneficiariesApiController(ICrudInteger<AgentVm> agentRepo, ICrudInteger<AssociationBeneficiaryVm> assoBenQuery,IBeneficiaryManagement beneficiaryQuery,
-            ICrudInteger<ClusterLocationVm> clusterQuery)
+            ICrudInteger<ClusterLocationVm> clusterQuery, ICrudInteger<BeneficiaryVm> repo)
         {
             _agentRepo = agentRepo;
             _beneficiaryQuery = beneficiaryQuery;
             _assoBenQuery = assoBenQuery;
             _clusterQuery = clusterQuery;
+            _repo = repo;
         }
 
         // POST: api/Beneficiary
@@ -61,8 +63,19 @@ namespace Geep.Web.Controllers.ApiController
                 vm.AgentId = agent.AgentId;
                 vm.Agent = null;
 
+                (int beneficiaryId, string message) response = (0, "");
+                //Check if Beneficiary already exist.
+                var beneficaiaryInDb = await _repo.GetByReferenceId(vm.ReferenceId);
+                if (beneficaiaryInDb != null)
+                {
+                    vm.BeneficiaryId = beneficaiaryInDb.BeneficiaryId;
+                    response = await _beneficiaryQuery.UpdateBeneficiary(vm);
+                }
+                else
+                {
+                    response = await _beneficiaryQuery.AddBeneficiary(vm);
+                }
 
-                var response = await _beneficiaryQuery.AddBeneficiary(vm);
                 if (response.beneficiaryId > 0) 
                 {
                     if (associationId > 0)

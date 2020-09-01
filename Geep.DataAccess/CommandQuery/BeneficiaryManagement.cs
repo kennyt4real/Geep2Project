@@ -75,6 +75,8 @@ namespace Geep.DataAccess.CommandQuery
             try
             {
                 var model = _mapper.Map<Beneficiary>(vm);
+                model.DateCreated = DateTime.Now;
+
                 _db.Beneficiaries.Add(model);
                 await _db.SaveChangesAsync();
                 return (model.BeneficiaryId, "Beneficiary Added Successfully");
@@ -84,6 +86,24 @@ namespace Geep.DataAccess.CommandQuery
             {
                 return (0, ex.ToFormattedString());
             }      
+        }
+
+        public async Task<(int beneficiaryId, string message)> UpdateBeneficiary(BeneficiaryVm vm)
+        {
+            try
+            {
+                var model = _mapper.Map<Beneficiary>(vm);
+                model.DateUpdated = DateTime.Now;
+
+                _db.Beneficiaries.Update(model);
+                await _db.SaveChangesAsync();
+                return (model.BeneficiaryId, "Beneficiary Updated Successfully");
+
+            }
+            catch (Exception ex)
+            {
+                return (0, ex.ToFormattedString());
+            }
         }
 
         public async Task<AssociationVm> GetAssociationByAssociationName(string groupName)

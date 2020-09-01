@@ -17,6 +17,6 @@ namespace Geep.DomainLayer.CustomAbstrations
         Task PushRecordsToWhiteList();
         Task<(int beneficiaryId, string message)> AddBeneficiary(BeneficiaryVm vm);
         Task<List<GeepAgent>> GetGeepAgents();
-
+        Task<(int beneficiaryId, string message)> UpdateBeneficiary(BeneficiaryVm vm);
     }
 }
