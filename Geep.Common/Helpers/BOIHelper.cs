@@ -70,8 +70,8 @@ namespace Geep.Common.Helpers
         {
             _client = null;
             //Client.BaseAddress = new Uri("http://localhost:5000/");
-            Client.BaseAddress = new Uri("https://localhost:44317/");
-            //Client.BaseAddress = new Uri("https://dev.cforce.live/");
+            //Client.BaseAddress = new Uri("https://localhost:44317/");
+            Client.BaseAddress = new Uri("https://dev.cforce.live/");
             Client.DefaultRequestHeaders.Accept.Clear();
             Client.DefaultRequestHeaders.Add("X-Tenant-Id", "-306299295");
 
