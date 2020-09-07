@@ -66,7 +66,7 @@ namespace Geep.Web.Controllers.ApiController
                 (int beneficiaryId, string message) response = (0, "");
                 //Check if Beneficiary already exist.
                 var beneficaiaryInDb = await _repo.GetByReferenceId(vm.ReferenceId);
-                if (beneficaiaryInDb != null)
+                if (beneficaiaryInDb != null && beneficaiaryInDb.BeneficiaryId > 0) 
                 {
                     vm.BeneficiaryId = beneficaiaryInDb.BeneficiaryId;
                     response = await _beneficiaryQuery.UpdateBeneficiary(vm);

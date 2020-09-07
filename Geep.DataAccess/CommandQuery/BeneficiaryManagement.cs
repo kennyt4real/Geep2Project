@@ -25,9 +25,11 @@ namespace Geep.DataAccess.CommandQuery
         private ICrudInteger<BeneficiaryVm> _beneficiaryQuery;
         private ICrudInteger<StateVm> _stateQuery;
         private ICrudInteger<ClusterLocationVm> _clusterQuery;
+        private ICrudInteger<AgentClusterLocationVm> _agentClusterQuery;
+        private ICrudInteger<AgentVm> _agentQuery;
 
-        public BeneficiaryManagement(GeepDbContext db, IRepo<Beneficiary> repo, IMapper mapper, ICrudInteger<BeneficiaryVm> beneficiaryQuery,
-            ICrudInteger<StateVm> stateQuery, ICrudInteger<ClusterLocationVm> clusterQuery)
+        public BeneficiaryManagement(GeepDbContext db, IRepo<Beneficiary> repo, IMapper mapper, ICrudInteger<BeneficiaryVm> beneficiaryQuery, ICrudInteger<AgentVm> agentQuery,
+            ICrudInteger<StateVm> stateQuery, ICrudInteger<ClusterLocationVm> clusterQuery, ICrudInteger<AgentClusterLocationVm> agentClusterQuery)
         {
             _repo = repo;
             _mapper = mapper;
@@ -35,6 +37,8 @@ namespace Geep.DataAccess.CommandQuery
             _beneficiaryQuery = beneficiaryQuery;
             _stateQuery = stateQuery;
             _clusterQuery = clusterQuery;
+            _agentClusterQuery = agentClusterQuery;
+            _agentQuery = agentQuery;
         }
 
         public async Task<List<BeneficiaryVm>> GetBeneficiaryByAssociationId(int id)
@@ -180,11 +184,87 @@ namespace Geep.DataAccess.CommandQuery
         {
             var response = await BOIHelper.GetGeepTeamUsers();
             var responseJson = await response.Content.ReadAsStringAsync();
-            var users = JsonConvert.DeserializeObject<List<GeepAgent>>(responseJson);
+            var teamUserResponse = JsonConvert.DeserializeObject<TeamUsersPortalResponse>(responseJson);
 
-            return users;
+
+            return teamUserResponse.Agents;
 
         }
+
+        public async Task<ResponseVm> AddAgentsToClusters(AgentClusterLocationVm vm)
+        {
+            var emails = new List<string>();
+            var clusters = new List<string>();
+
+            foreach (var userId in vm.AgentIds)
+            {
+                var agent = await GetAgentByReferenceId("MOB" + "-" + userId.ToString().PadLeft(5, '0'));
+               
+                if (agent != null)
+                {
+                    if (!emails.Contains(agent.Email))
+                        emails.Add(agent.Email);
+                    foreach (var clusterId in vm.ClusterLocationIds)
+                    {
+                        var cluster = await _clusterQuery.GetByReferenceId(clusterId);
+
+                        if (cluster != null && !await AgentIsAlreadyAddedToCluster(agent.AgentId, cluster.ClusterLocationId))
+                        {
+                            if (!clusters.Contains(cluster.Name))
+                                clusters.Add(cluster.Name);
+                            vm.AgentId = agent.AgentId;
+                            vm.ClusterLocationId = cluster.ClusterLocationId;
+                            await _agentClusterQuery.AddOrUpdate(vm);
+                        }
+                    }
+                }
+                else
+                {
+                    var agentResponse = await BOIHelper.GetUserById(userId);
+                    var agentResponsJson = await agentResponse.Content.ReadAsStringAsync();
+                    var portalAgent = JsonConvert.DeserializeObject<PortalAgent>(agentResponsJson);
+                    portalAgent.Agent.ReferenceId = "MOB" + "-" + portalAgent.Agent.Id.ToString().PadLeft(5, '0');
+                    agent = await AddAgent(portalAgent.Agent);
+                    if (agent != null)
+                    {
+                        if (!emails.Contains(agent.Email))
+                            emails.Add(agent.Email);
+                        foreach (var clusterId in vm.ClusterLocationIds)
+                        {
+                            var cluster = await _clusterQuery.GetByReferenceId(clusterId);
+                            if (cluster != null)
+                            {
+                                if (!clusters.Contains(cluster.Name))
+                                    clusters.Add(cluster.Name);
+                                vm.AgentId = agent.AgentId;
+                                vm.ClusterLocationId = cluster.ClusterLocationId;
+                                await _agentClusterQuery.AddOrUpdate(vm);
+                            }
+
+                        }
+                    }
+                }
+            }
+            var res = await BOIHelper.AddUsersToClusters(new AddUserToClusterModel 
+            { 
+                Emails = string.Join(",", emails.ToArray()).ToLower().Remove(' ','-'), 
+                Clusters = string.Join(",", clusters.ToArray()).ToLower().Remove(' ', '-') 
+            });
+            var resJson = await res.Content.ReadAsStringAsync();
+            var portalRes = JsonConvert.DeserializeObject<PortalAgent>(resJson);
+            if (portalRes.StatusCode.Equals(200))
+            {
+                return new ResponseVm { Status = true, Message = "Agents Added to Clusters Successfully..." };
+            }
+            return new ResponseVm { Status = false, Message = "Oops,  Something went wrong" };
+        }
+        private async Task<bool> AgentIsAlreadyAddedToCluster(int agentId, int clusterId)
+        {
+            var agentCluster = await _db.AgentClusterLocations.AsNoTracking().FirstOrDefaultAsync(x => x.AgentId.Equals(agentId) && x.ClusterLocationId.Equals(clusterId));
+            if (agentCluster == null)
+                return false;
+            return true;
+        } 
 
     }
 }

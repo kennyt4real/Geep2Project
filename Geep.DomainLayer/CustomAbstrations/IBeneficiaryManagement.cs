@@ -18,5 +18,7 @@ namespace Geep.DomainLayer.CustomAbstrations
         Task<(int beneficiaryId, string message)> AddBeneficiary(BeneficiaryVm vm);
         Task<List<GeepAgent>> GetGeepAgents();
         Task<(int beneficiaryId, string message)> UpdateBeneficiary(BeneficiaryVm vm);
+        Task<ResponseVm> AddAgentsToClusters(AgentClusterLocationVm vm);
+
     }
 }

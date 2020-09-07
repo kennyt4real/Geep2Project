@@ -18,6 +18,14 @@ namespace Geep.ViewModels.CoreVm
         [JsonPropertyName("agent_id")]
         public string ReferenceId { get; set; }
 
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [Required]
+        [DisplayName("Email")]
+        [JsonPropertyName("agent_email")]
+        public string Email { get; set; }
+
         [Required]
         [DisplayName("First Name")]
         [JsonPropertyName("agent_firstname")]

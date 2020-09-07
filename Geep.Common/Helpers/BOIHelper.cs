@@ -66,5 +66,30 @@ namespace Geep.Common.Helpers
 
         }
 
+        public static async Task<HttpResponseMessage> GetUserById(int userId)
+        {
+            _client = null;
+            //Client.BaseAddress = new Uri("http://localhost:5000/");
+            Client.BaseAddress = new Uri("https://localhost:44317/");
+            //Client.BaseAddress = new Uri("https://dev.cforce.live/");
+            Client.DefaultRequestHeaders.Accept.Clear();
+            Client.DefaultRequestHeaders.Add("X-Tenant-Id", "-306299295");
+
+            return await Client.GetAsync($"api/user/getuserbyid?userId={userId}");
+
+        }
+        public static async Task<HttpResponseMessage> AddUsersToClusters(AddUserToClusterModel model)
+        {
+            _client = null;
+
+            //Client.BaseAddress = new Uri("http://localhost:5000/");
+            Client.BaseAddress = new Uri("https://dev.cforce.live/");
+            Client.DefaultRequestHeaders.Accept.Clear();
+            Client.DefaultRequestHeaders.Add("X-Tenant-Id", "-306299295");
+
+            return await Client.PostAsJsonAsync("api/user/addusertocluster", model);
+        }
+
+
     }
 }

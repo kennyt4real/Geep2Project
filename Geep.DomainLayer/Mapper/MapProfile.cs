@@ -28,6 +28,7 @@ namespace Geep.DomainLayer.Mapper
             CreateMap<AgentClusterLocationVm, AgentClusterLocation>();
             CreateMap<AgentClusterLocation, AgentClusterLocationVm>()
                 .ForMember(x => x.AgentName, o => o.MapFrom(source => source.Agent.AgentFullName))
+                .ForMember(x => x.AgentEmail, o => o.MapFrom(source => source.Agent.Email))
                 .ForMember(x => x.AgentRefId, o => o.MapFrom(source => source.Agent.ReferenceId))
                 .ForMember(x => x.ClusterName, o => o.MapFrom(source => source.ClusterLocation.Name))
                 .ForMember(x => x.ClusterStateName, o => o.MapFrom(source => source.ClusterLocation.State.StateName));

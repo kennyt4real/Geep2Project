@@ -36,13 +36,11 @@ namespace Geep.Web.Controllers
 
         public async  Task<IActionResult> Index()
         {
-            //ViewData["RoleName"] = new MultiSelectList(selectRole, "Name", "Name");
             var agents = await _beneficiaryQuery.GetGeepAgents();
-            var agentsEmails = agents.Select(s => new { Name = s.Email }).ToList();
 
 
             ViewData["StateId"] = new SelectList(await _stateQuery.GetAll(), "StateId", "StateName");
-            ViewData["AgentId"] = new MultiSelectList(agentsEmails, "Name", "Name");
+            ViewData["AgentId"] = new MultiSelectList(agents, "AgentId", "Email");
             return View();
         }
 
@@ -67,7 +65,7 @@ namespace Geep.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _repo.AddOrUpdate(vm);
+                var response = await _beneficiaryQuery.AddAgentsToClusters(vm);
                 return Json(new { status = response.Status, message = response.Message });
             }
             string errorMessages = string.Join("; ", ModelState.Values

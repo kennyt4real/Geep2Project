@@ -10,6 +10,7 @@ namespace Geep.Models.Core
         public int AgentId { get; set; }
         [UniqueKey(groupId: "1", order: 0)]
         public string ReferenceId { get; set; }
+        public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string MiddleName { get; set; }

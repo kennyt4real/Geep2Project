@@ -9,20 +9,22 @@ namespace Geep.ViewModels.CoreVm
     public class AgentClusterLocationVm : AuditVm
     {
         public int AgentClusterLocationId { get; set; }
+        
         [Required]
-        [DisplayName("Agent Name")]
-        public int AgentId { get; set; }
-        [Required]
-        [DisplayName("Cluster Name")]
-        public int ClusterLocationId { get; set; }
+        [DisplayName("Cluster Name(s)")]
+        public int[] ClusterLocationIds { get; set; }
         [Required]
         [DisplayName("State")]
         public int StateId { get; set; }
 
         [Required]
         [DisplayName("Email(s)")]
-        public string[] AgentEmails { get; set; }
+        public int[] AgentIds { get; set; }
 
+        public int ClusterLocationId { get; set; }
+        public int AgentId { get; set; }
+
+        public string AgentEmail { get; set; }
         public string AgentName { get; set; }
         public string AgentRefId { get; set; }
         public string ClusterName { get; set; }

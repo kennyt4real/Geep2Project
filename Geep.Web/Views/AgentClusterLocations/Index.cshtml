@@ -30,45 +30,23 @@
                             </select>
                             <span asp-validation-for="StateId" class="text-danger"></span>
                         </div>
-
-                        @*<div class="col-md-12 form-group">
-            <label asp-for="AgentId" class="control-label"></label>
-            <select asp-for="AgentId" class="form-control" asp-items="ViewBag.AgentId">
-                <option>--Select Agent--</option>
-            </select>
-            <span asp-validation-for="AgentId" class="text-danger"></span>
-        </div>*@
-                        @*<div class="col-md-12 form-group">
-                            <label>Multiple select using select 2</label>
-                            <select class="js-example-basic-multiple" multiple="multiple" data-width="100%">
-                                <option value="TX">Texas</option>
-                                <option value="WY">Wyoming</option>
-                                <option value="NY">New York</option>
-                                <option value="FL">Florida</option>
-                                <option value="KN">Kansas</option>
-                                <option value="HW">Hawaii</option>
-                            </select>
-                        </div>*@
-
                         <div class="col-md-12 form-group">
-                            <label asp-for="AgentEmails" class="control-label"></label>
-                            <select asp-for="AgentEmails" class="js-example-basic-multiple form-control" multiple="multiple" asp-items="ViewBag.AgentId">
+                            <label asp-for="AgentIds" class="control-label"></label>
+                            <select asp-for="AgentIds" class="js-example-basic-multiple form-control" multiple="multiple" asp-items="ViewBag.AgentId">
                                 <option value="">--Select Email(s)--</option>
                             </select>
-                            <span asp-validation-for="AgentEmails" class="text-danger"></span>
+                            <span asp-validation-for="AgentIds" class="text-danger"></span>
                         </div>
-
-
                         <div class="col-md-12 form-group">
-                            <label asp-for="ClusterLocationId" class="control-label"></label>
-                            <select asp-for="ClusterLocationId" class="form-control">
+                            <label asp-for="ClusterLocationIds" class="control-label"></label>
+                            <select asp-for="ClusterLocationIds" class="js-example-basic-multiple form-control" multiple="multiple">
                                 <option>--Select Cluster Location--</option>
                             </select>
-                            <span asp-validation-for="ClusterLocationId" class="text-danger"></span>
+                            <span asp-validation-for="ClusterLocationIds" class="text-danger"></span>
                         </div>
 
                         <div class="col-md-12  text-md-center">
-                            <input type="submit" value="ADD STATE" class="text-uppercase btn btn-rounded mb-5 btn-info" />
+                            <input type="submit" value="ADD" class="text-uppercase btn btn-rounded mb-5 btn-info" />
 
                             <a href="#" class="text-uppercase btn btn-rounded mb-5 btn-warning" data-dismiss="modal">CANCEL</a>
                         </div>
@@ -96,6 +74,7 @@
                     <table id="Jdatatable" class="table table-bordered table-striped">
                         <thead>
                             <tr>
+                                <th>Agent Email</th>
                                 <th>Agent Name</th>
                                 <th>Cluster Name</th>
                                 <th>State Name</th>
@@ -128,6 +107,7 @@
                 "datatype": "json",
             },
             "columns": [
+                { "data": "AgentEmail", "autoWidth": true },
                 { "data": "AgentName", "autoWidth": true },
                 { "data": "ClusterName", "autoWidth": true },
                 { "data": "ClusterStateName", "autoWidth": true },
@@ -135,8 +115,7 @@
                     "data": "AgentClusterLocationId",
                     "autoWidth": true,
                     "render": function (data) {
-                        return '<a href="#" onclick="Edit(' + data + ')"><i><u><small>Edit</small></u></i></a>&nbsp;&nbsp;' +
-                            '<a href="#" onclick="Delete(' + data + ')"><i class="text-danger"><u><small >Delete</small></u></i></a>';
+                        return '<a href="#" onclick="Delete(' + data + ')"><i class="text-danger"><u><small >Delete</small></u></i></a>';
                     }
                 }
 
@@ -223,7 +202,7 @@
                     $("#ClusterLocationId").html("");
                     $.each($.parseJSON(result),
                         function (i, city) {
-                            $("#ClusterLocationId").append($('<option></option>').val(city.ClusterLocationId).html(city.Name));
+                            $("#ClusterLocationIds").append($('<option></option>').val(city.ClusterLocationId).html(city.Name));
                         });
                 },
                 error: function () {
