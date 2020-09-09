@@ -29,7 +29,7 @@ namespace Geep.Common.Helpers
         {
             _client = null;
 
-            Client.BaseAddress = new Uri("http://whitelist.tradermoni.ng");
+            Client.BaseAddress = new Uri("https://whitelist.tradermoni.ng");
             Client.DefaultRequestHeaders.Accept.Clear();
 
             Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -38,7 +38,7 @@ namespace Geep.Common.Helpers
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            return await Client.PostAsJsonAsync("/api/candidate/create", boiFields);
+            return await Client.PostAsJsonAsync("/apiv2/candidate/create", boiFields);
         }
 
         public static async Task<HttpResponseMessage> UpdateRecordOnPortal(UpdateRecordOnPortalModel model)

@@ -17,6 +17,9 @@ namespace Geep.ViewModels.CoreVm
         [JsonPropertyName("cluster_location")]
         public int ClusterLocationId { get; set; }
 
+        [JsonPropertyName("lgaid")]
+        public int LGAId { get; set; }
+
         [JsonPropertyName("tradetypeid")]
         public int TreadeTypeId { get; set; }
 

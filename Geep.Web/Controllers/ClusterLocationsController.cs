@@ -10,6 +10,10 @@ using Geep.Models.Core;
 using Geep.ViewModels.CoreVm;
 using Geep.DomainLayer.GeneralAbstractions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using ClosedXML.Excel;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Geep.Web.Controllers
 {
@@ -19,14 +23,16 @@ namespace Geep.Web.Controllers
     {
         private ICrudInteger<ClusterLocationVm> _repo;
         private readonly ICrudInteger<StateVm> _stateQuery;
+        private IWebHostEnvironment _environment;
 
-        public ClusterLocationsController(ICrudInteger<ClusterLocationVm> repo, ICrudInteger<StateVm> stateQuery)
+        public ClusterLocationsController(ICrudInteger<ClusterLocationVm> repo, ICrudInteger<StateVm> stateQuery, IWebHostEnvironment environment)
         {
             _repo = repo;
             _stateQuery = stateQuery;
+            _environment = environment;
         }
 
-        public async  Task<IActionResult> Index()
+        public async Task<IActionResult> Index()
         {
             ViewData["StateId"] = new SelectList(await _stateQuery.GetAll(), "StateId", "StateName");
 
@@ -59,6 +65,44 @@ namespace Geep.Web.Controllers
                                                     .SelectMany(x => x.Errors)
                                                     .Select(x => x.ErrorMessage));
             return Json(new { status = false, message = $"Oops.. {errorMessages}" });
+        }
+
+        public IActionResult Import()
+        {
+            IFormFile file = Request.Form.Files[0];
+            string wwwPath = this._environment.WebRootPath;
+            string contentPath = this._environment.ContentRootPath;
+
+            string path = Path.Combine(this._environment.WebRootPath, "Upload");
+
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            var clusterLocationList = new List<ClusterLocationVm>();
+            using (var excelWorkbook = new XLWorkbook(Path.GetFileName(file.FileName)))
+            {
+                var ws1 = excelWorkbook.Worksheet(1);
+                int rowCount = ws1.RowsUsed().Count();
+                int colCount = ws1.ColumnsUsed().Count();
+
+
+                for (int i = 2; i <= rowCount; i++)
+                {
+                    for (int j = 1; j <= 1; j++)
+                    {
+                        var clusterLocation = new ClusterLocationVm
+                        {
+                            ReferenceId = int.Parse(ws1.Cell(i, 1).Value.ToString()),
+                            Name = ws1.Cell(i, 2).Value.ToString(),
+                            StateId = int.Parse(ws1.Cell(i, 5).Value.ToString()),
+                           
+                        };
+                        clusterLocationList.Add(clusterLocation);
+                    }
+                }
+                return View();
+            }
         }
 
         [HttpPost, ActionName("Delete")]

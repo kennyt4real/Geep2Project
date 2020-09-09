@@ -56,5 +56,7 @@ namespace Geep.Models.Core
         public int NumberOfEmployees { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalValueOfCurrentBusiness { get; set; }
+        public int LGAId { get; set; }
+
     }
 }

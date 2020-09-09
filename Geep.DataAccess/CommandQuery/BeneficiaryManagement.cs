@@ -89,7 +89,7 @@ namespace Geep.DataAccess.CommandQuery
             catch (Exception ex)
             {
                 return (0, ex.ToFormattedString());
-            }      
+            }
         }
 
         public async Task<(int beneficiaryId, string message)> UpdateBeneficiary(BeneficiaryVm vm)
@@ -123,15 +123,17 @@ namespace Geep.DataAccess.CommandQuery
             int rejectedRecords = 0;
             foreach (var beneficiary in beneficiaries)
             {
+
                 var boiField = _mapper.Map<BOIFields>(beneficiary);
                 var clusterLocation = await _clusterQuery.GetById(beneficiary.ClusterLocationId);
                 boiField.StateId = clusterLocation.State.ReferenceId;
-                boiField.ClusterLocation = clusterLocation.ReferenceId;
+
+                boiField.ClusterLocationId = clusterLocation.ReferenceId;
 
                 if (!string.IsNullOrEmpty(beneficiary.Picture))
                     boiField.Picture = "data:image/jpeg;base64," + AzureHelper.FromAzureToBase64(beneficiary.Picture);
 
-                if(!string.IsNullOrEmpty(beneficiary.FacialPicture))
+                if (!string.IsNullOrEmpty(beneficiary.FacialPicture))
                     boiField.FacialPicture = "data:image/jpeg;base64," + AzureHelper.FromAzureToBase64(beneficiary.FacialPicture);
 
                 boiField.Agent = new AgentVm[] { beneficiary.Agent };
@@ -175,6 +177,9 @@ namespace Geep.DataAccess.CommandQuery
                     if (portalResponseModel.Data)
                         beneficiary.IsUpdatedOnPortal = true;
 
+                    beneficiary.Agent = null;
+                    beneficiary.ClusterLocationVm = null;
+                    beneficiary.Association = null;
                     await _beneficiaryQuery.AddOrUpdate(beneficiary);
 
                 }
@@ -199,7 +204,7 @@ namespace Geep.DataAccess.CommandQuery
             foreach (var userId in vm.AgentIds)
             {
                 var agent = await GetAgentByReferenceId("MOB" + "-" + userId.ToString().PadLeft(5, '0'));
-               
+
                 if (agent != null)
                 {
                     if (!emails.Contains(agent.Email))
@@ -245,10 +250,10 @@ namespace Geep.DataAccess.CommandQuery
                     }
                 }
             }
-            var res = await BOIHelper.AddUsersToClusters(new AddUserToClusterModel 
-            { 
-                Emails = string.Join(",", emails.ToArray()).ToLower().Remove(' ','-'), 
-                Clusters = string.Join(",", clusters.ToArray()).ToLower().Remove(' ', '-') 
+            var res = await BOIHelper.AddUsersToClusters(new AddUserToClusterModel
+            {
+                Emails = string.Join(",", emails.ToArray()).ToLower().Remove(' ', '-'),
+                Clusters = string.Join(",", clusters.ToArray()).ToLower().Remove(' ', '-')
             });
             var resJson = await res.Content.ReadAsStringAsync();
             var portalRes = JsonConvert.DeserializeObject<PortalAgent>(resJson);
@@ -264,7 +269,7 @@ namespace Geep.DataAccess.CommandQuery
             if (agentCluster == null)
                 return false;
             return true;
-        } 
+        }
 
     }
 }

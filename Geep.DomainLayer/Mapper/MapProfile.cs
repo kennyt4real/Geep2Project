@@ -60,7 +60,8 @@ namespace Geep.DomainLayer.Mapper
 
             CreateMap<BeneficiaryVm, UpdateRecordOnPortalModel>();
 
-            CreateMap<BeneficiaryVm, BOIFields>();
+            CreateMap<BeneficiaryVm, BOIFields>()
+                .ForMember(x=>x.Agent, opt => opt.Ignore());
         }
         
     }
