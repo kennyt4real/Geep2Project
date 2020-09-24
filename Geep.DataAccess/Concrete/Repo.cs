@@ -177,6 +177,16 @@ namespace Geep.DataAccess.Concrete
             }
         }
 
+        public async Task SaveMultiple(List<T> ts)
+        {
+            foreach (var t in ts)
+            {
+                await Save(t);
+            }
+
+
+        }
+
         public string UserId
         {
             get

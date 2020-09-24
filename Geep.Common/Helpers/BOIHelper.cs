@@ -29,7 +29,8 @@ namespace Geep.Common.Helpers
         {
             _client = null;
 
-            Client.BaseAddress = new Uri("https://whitelist.tradermoni.ng");
+            //Client.BaseAddress = new Uri("https://whitelist.tradermoni.ng");
+            Client.BaseAddress = new Uri("https://sandbox.geep.ng");
             Client.DefaultRequestHeaders.Accept.Clear();
 
             Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

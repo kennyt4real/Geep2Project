@@ -15,7 +15,7 @@ namespace Geep.Models.Core
         public int TreadeTypeId { get; set; }
         public int TradeSubType { get; set; }
         public int AgentId { get; set; }
-        public int CurrentProgramId { get; set; }
+        public int CurrentProductId { get; set; }
         public int? AssociationId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

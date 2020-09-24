@@ -29,7 +29,7 @@ namespace Geep.ViewModels.CoreVm
         public int AgentId { get; set; }
 
         [JsonPropertyName("cureent_program_id")]
-        public int CurrentProgramId { get; set; }
+        public int CurrentProductId { get; set; }
 
         [JsonPropertyName("association_id")]
         public int? AssociationId { get; set; }

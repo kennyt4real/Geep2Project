@@ -1,0 +1,20 @@
+﻿
+<form asp-controller="ClusterLocations" asp-action="UploadClusterLocations" method="post" enctype="multipart/form-data" id = "excelform">
+    <span>Upload Clusters Excel File </span>
+    <input type="file" name="excelfile" />
+    <br />
+    <br />
+    <input id="btnsubmitExcel" type="submit" value="Upload" class="btn btn-lg btn-primary" />
+</form>
+
+
+<script type="text/javascript">
+    $(function () {
+        $('#excelform').submit(function () {
+            $("input[type='submit']", this)
+                .val("Uploading Please Wait...")
+                .attr('disabled', 'disabled');
+            return true;
+        });
+    });
+</script>

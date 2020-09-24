@@ -1,4 +1,5 @@
 ﻿using Geep.ViewModels;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,5 +15,6 @@ namespace Geep.DomainLayer.GeneralAbstractions
         Task<T> GetByReferenceId(int refId);
         Task<ResponseVm> AddOrUpdate(T t);
         Task<ResponseVm> Delete(int id);
+        Task<ResponseVm> ExcelImport(IFormFile excelFile);
     }
 }

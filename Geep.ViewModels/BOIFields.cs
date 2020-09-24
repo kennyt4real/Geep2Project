@@ -41,8 +41,8 @@ namespace Geep.ViewModels
         [JsonProperty("trade_subtype")]
         public int TradeSubType { get; set; }
 
-        [JsonProperty("cureent_program_id")]
-        public int CurrentProgramId { get; set; }
+        [JsonProperty("current_product_id")]
+        public int CurrentProductId { get; set; }
 
         [JsonProperty("association_id")]
         public int? AssociationId { get; set; }
@@ -115,6 +115,9 @@ namespace Geep.ViewModels
 
         [JsonProperty("total_value_of_current_business")]
         public decimal TotalValueOfCurrentBusiness { get; set; }
+
+        [JsonProperty("aggregator_id")]
+        public string AggregatorId { get; set; }
 
         [JsonProperty("agent")]
         public AgentVm[] Agent { get; set; }

@@ -1,5 +1,6 @@
 ﻿using Geep.Models;
 using Geep.ViewModels;
+using Geep.ViewModels.CoreVm;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -24,5 +25,7 @@ namespace Geep.DomainLayer.GeneralAbstractions
         void Delete(T t);
         Task<ResponseVm> SaveChangesAsync();
         public string UserId { get; set; }
+
+        Task SaveMultiple(List<T> ts);
     }
 }

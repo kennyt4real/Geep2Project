@@ -3,6 +3,7 @@ using Geep.DomainLayer.GeneralAbstractions;
 using Geep.Models.Core;
 using Geep.ViewModels;
 using Geep.ViewModels.CoreVm;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -60,6 +61,9 @@ namespace Geep.DataAccess.CommandQuery
             throw new System.NotImplementedException();
         }
 
-       
+        public Task<ResponseVm> ExcelImport(IFormFile excelFile)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

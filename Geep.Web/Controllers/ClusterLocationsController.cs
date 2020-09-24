@@ -11,7 +11,6 @@ using Geep.ViewModels.CoreVm;
 using Geep.DomainLayer.GeneralAbstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using ClosedXML.Excel;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 
@@ -66,43 +65,27 @@ namespace Geep.Web.Controllers
                                                     .Select(x => x.ErrorMessage));
             return Json(new { status = false, message = $"Oops.. {errorMessages}" });
         }
-
-        public IActionResult Import()
+        public PartialViewResult UploadClusterLocations()
         {
-            IFormFile file = Request.Form.Files[0];
-            string wwwPath = this._environment.WebRootPath;
-            string contentPath = this._environment.ContentRootPath;
+            return PartialView();
+        }
 
-            string path = Path.Combine(this._environment.WebRootPath, "Upload");
 
-            if (!Directory.Exists(path))
+        [HttpPost]
+        public async Task<IActionResult> UploadClusterLocations(IFormFile excelFile)
+        {
+            //var file = Request.Form.Files[0];
+
+            if (excelFile == null || excelFile.Length == 0)
             {
-                Directory.CreateDirectory(path);
+                return RedirectToAction("Index");
             }
-            var clusterLocationList = new List<ClusterLocationVm>();
-            using (var excelWorkbook = new XLWorkbook(Path.GetFileName(file.FileName)))
-            {
-                var ws1 = excelWorkbook.Worksheet(1);
-                int rowCount = ws1.RowsUsed().Count();
-                int colCount = ws1.ColumnsUsed().Count();
+            await _repo.ExcelImport(excelFile);
 
+            return RedirectToAction("Index");
 
-                for (int i = 2; i <= rowCount; i++)
-                {
-                    for (int j = 1; j <= 1; j++)
-                    {
-                        var clusterLocation = new ClusterLocationVm
-                        {
-                            ReferenceId = int.Parse(ws1.Cell(i, 1).Value.ToString()),
-                            Name = ws1.Cell(i, 2).Value.ToString(),
-                            StateId = int.Parse(ws1.Cell(i, 5).Value.ToString()),
-                           
-                        };
-                        clusterLocationList.Add(clusterLocation);
-                    }
-                }
-                return View();
-            }
+            //return Json(new { status = true, message = $"Cluster Locations Added Successfully {excelFile.FileName}" });
+
         }
 
         [HttpPost, ActionName("Delete")]

@@ -138,6 +138,7 @@ namespace Geep.DataAccess.CommandQuery
 
                 boiField.Agent = new AgentVm[] { beneficiary.Agent };
 
+                boiField.AggregatorId = "1";
 
                 var response = await BOIHelper.PusheToWhiteList(boiField);
                 if (response.IsSuccessStatusCode)
@@ -170,17 +171,22 @@ namespace Geep.DataAccess.CommandQuery
                             rejectedRecords = rejectedRecords + 1;
                         }
                     }
+                    beneficiary.Agent = null;
+                    beneficiary.ClusterLocationVm = null;
+                    beneficiary.Association = null;
+                    await _beneficiaryQuery.AddOrUpdate(beneficiary);
                     var updatePortalVm = _mapper.Map<UpdateRecordOnPortalModel>(beneficiary);
                     var updateOnPortalResponse = await BOIHelper.UpdateRecordOnPortal(updatePortalVm);
                     var portalResponseJson = await updateOnPortalResponse.Content.ReadAsStringAsync();
                     var portalResponseModel = JsonConvert.DeserializeObject<PortalResponseVm>(portalResponseJson);
                     if (portalResponseModel.Data)
+                    {
                         beneficiary.IsUpdatedOnPortal = true;
+                        await _beneficiaryQuery.AddOrUpdate(beneficiary);
 
-                    beneficiary.Agent = null;
-                    beneficiary.ClusterLocationVm = null;
-                    beneficiary.Association = null;
-                    await _beneficiaryQuery.AddOrUpdate(beneficiary);
+                    }
+
+
 
                 }
             }
