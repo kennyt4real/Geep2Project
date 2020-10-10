@@ -12,10 +12,10 @@ namespace Geep.DomainLayer.Mapper
     {
         public MapProfile()
         {
-            // Reverse map to be reviewedd
+            // Reverse map to be reviewed
 
 
-            CreateMap<Models.Core.Agent, AgentVm>().ReverseMap();
+            CreateMap<Agent, AgentVm>().ReverseMap();
 
 
             CreateMap<BeneficiaryVm, Beneficiary>();
@@ -59,9 +59,20 @@ namespace Geep.DomainLayer.Mapper
                 .ForMember(x => x.StateName, o => o.MapFrom(source => source.State.StateName));
 
             CreateMap<BeneficiaryVm, UpdateRecordOnPortalModel>();
+            CreateMap<AssociationVm, UpdateRecordOnPortalModel>();
+
+            CreateMap<GroupFields, AssociationVm>().ReverseMap();
+
+            CreateMap<Document, DocumentVm>().ReverseMap();
+
+            CreateMap<GroupExco, GroupExcoVm>().ReverseMap();
 
             CreateMap<BeneficiaryVm, BOIFields>()
                 .ForMember(x=>x.Agent, opt => opt.Ignore());
+
+            CreateMap<BeneficiaryVm, ExcoInformation>();
+
+            CreateMap<AssociationVm, GroupFields>();
         }
         
     }

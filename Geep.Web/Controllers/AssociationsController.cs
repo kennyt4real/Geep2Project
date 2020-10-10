@@ -11,6 +11,7 @@ using Geep.DomainLayer.GeneralAbstractions;
 using Geep.ViewModels.CoreVm;
 using static Geep.ViewModels.Constants.PopUp;
 using Microsoft.AspNetCore.Authorization;
+using Geep.DomainLayer.CustomAbstrations;
 
 namespace Geep.Web.Controllers
 {
@@ -20,11 +21,13 @@ namespace Geep.Web.Controllers
     {
         private ICrudInteger<AssociationVm> _repo;
         private ICrudInteger<StateVm> _stateQuery;
+        private IEntitiesManagement _beneficiaryQuery;
 
-        public AssociationsController(ICrudInteger<AssociationVm> repo, ICrudInteger<StateVm> stateQuery)
+        public AssociationsController(ICrudInteger<AssociationVm> repo, ICrudInteger<StateVm> stateQuery, IEntitiesManagement beneficiaryQuery)
         {
             _repo = repo;
             _stateQuery = stateQuery;
+            _beneficiaryQuery = beneficiaryQuery;
         }
 
         public IActionResult Index()
@@ -38,6 +41,13 @@ namespace Geep.Web.Controllers
             return Json(new { data });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> PushGroupsToWhiteList()
+        {
+            await _beneficiaryQuery.CreateGroupOnWhiteList();
+            return Json(new { status = true, message = "Pushing Records to WhiteList in progress...Will notify you via a mail at the end of the task!!!" });
+        }
+
         public async Task<IActionResult> Save(int id)
         {
             var model = await _repo.GetById(id);
@@ -45,7 +55,7 @@ namespace Geep.Web.Controllers
                          select new { ID = s, Name = s.ToString() };
 
 
-            ViewData["Status"] = new SelectList(status, "Name", "Name", model?.AccreditationStstud);
+            ViewData["Status"] = new SelectList(status, "Name", "Name", model?.AccreditationStatus);
 
             ViewData["StateId"] = new SelectList(await _stateQuery.GetAll(), "StateId", "StateName", model?.StateId);
 

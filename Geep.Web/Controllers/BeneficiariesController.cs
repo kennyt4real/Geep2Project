@@ -19,11 +19,11 @@ namespace Geep.Web.Controllers
     public class BeneficiariesController : Controller
     {
         private ICrudInteger<BeneficiaryVm> _repo;
-        private IBeneficiaryManagement _beneficiaryQuery;
+        private IEntitiesManagement _beneficiaryQuery;
         private ICrudInteger<AgentVm> _agentQuery;
         private ICrudInteger<AssociationVm> _associationQuery;
 
-        public BeneficiariesController(ICrudInteger<BeneficiaryVm> repo, IBeneficiaryManagement beneficiaryQuery, 
+        public BeneficiariesController(ICrudInteger<BeneficiaryVm> repo, IEntitiesManagement beneficiaryQuery, 
                                                 ICrudInteger<AgentVm> agentQuery, ICrudInteger<AssociationVm> associationQuery)
         {
             _repo = repo;
@@ -79,7 +79,7 @@ namespace Geep.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> PushRecordsToWhiteList()
         {
-            await _beneficiaryQuery.PushRecordsToWhiteList();
+            await _beneficiaryQuery.PushBeneficiaryRecordsToWhiteList();
             return Json(new {status = true, message = "Pushing Records to WhiteList in progress...Will notify you via a mail at the end of the task!!!" });
         }
 

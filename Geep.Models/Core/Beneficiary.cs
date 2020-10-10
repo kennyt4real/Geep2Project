@@ -38,6 +38,7 @@ namespace Geep.Models.Core
         public string DateEnumerated { get; set; }
         public string NextOfKinAddress { get; set; }
         public string NextOfKinPhone { get; set; }
+        public string Position { get; set; }
         public string GuarantorFirstName { get; set; }
         public string GuarantoLastName { get; set; }
         public string GuarantorFirstPhone { get; set; }

@@ -8,6 +8,7 @@ using Geep.DomainLayer.Mapper;
 using Geep.ViewModels;
 using Geep.ViewModels.CoreVm;
 using Geep.Web.Services;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -36,7 +37,7 @@ namespace Geep.Web
             services.AddScoped(typeof(ICrudInteger<BeneficiaryVm>), typeof(BeneficiaryCQ));
             services.AddScoped(typeof(ICrudInteger<ClusterLocationVm>), typeof(ClusterLocationCQ));
             services.AddScoped(typeof(ICrudInteger<LocalGovernmentAreaVm>), typeof(LocalGovernmentAreaCQ));
-            services.AddScoped(typeof(IBeneficiaryManagement), typeof(BeneficiaryManagement));
+            services.AddScoped(typeof(IEntitiesManagement), typeof(EntitiesManagement));
             services.AddScoped(typeof(ICrudInteger<StateVm>), typeof(StateCQ));
 
             services.AddHttpContextAccessor();
@@ -88,6 +89,9 @@ namespace Geep.Web
            
             services.AddControllers();
             services.AddMemoryCache();
+
+            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
 
             services.AddCors(options =>
             {

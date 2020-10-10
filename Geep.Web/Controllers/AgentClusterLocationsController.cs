@@ -22,9 +22,9 @@ namespace Geep.Web.Controllers
         private ICrudInteger<StateVm> _stateQuery;
         private readonly ICrudInteger<AgentVm> _agentQuery;
         private readonly ICrudInteger<ClusterLocationVm> _clusterQuery;
-        private readonly IBeneficiaryManagement _beneficiaryQuery;
+        private readonly IEntitiesManagement _beneficiaryQuery;
 
-        public AgentClusterLocationsController(ICrudInteger<AgentClusterLocationVm> repo, ICrudInteger<StateVm> stateQuery, IBeneficiaryManagement beneficiaryQuery, 
+        public AgentClusterLocationsController(ICrudInteger<AgentClusterLocationVm> repo, ICrudInteger<StateVm> stateQuery, IEntitiesManagement beneficiaryQuery, 
                                             ICrudInteger<AgentVm> agentQuery, ICrudInteger<ClusterLocationVm> clusterQuery )
         {
             _repo = repo;

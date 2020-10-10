@@ -7,6 +7,8 @@
   <ItemGroup>
     <Compile Remove="Migrations\20200812150932_InitialCreateUpdate.cs" />
     <Compile Remove="Migrations\20200812150932_InitialCreateUpdate.Designer.cs" />
+    <Compile Remove="Migrations\20201002002336_AddedMorePropertiesToAssociationAndAddedDocAndGroupExcos.cs" />
+    <Compile Remove="Migrations\20201002002336_AddedMorePropertiesToAssociationAndAddedDocAndGroupExcos.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

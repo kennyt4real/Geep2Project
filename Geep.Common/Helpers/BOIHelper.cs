@@ -42,6 +42,23 @@ namespace Geep.Common.Helpers
             return await Client.PostAsJsonAsync("/apiv2/candidate/create", boiFields);
         }
 
+        public static async Task<HttpResponseMessage> PusheToWhiteList(GroupFields groupFields)
+        {
+            _client = null;
+
+            //Client.BaseAddress = new Uri("https://whitelist.tradermoni.ng");
+            Client.BaseAddress = new Uri("https://sandbox.geep.ng");
+            Client.DefaultRequestHeaders.Accept.Clear();
+
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            Client.DefaultRequestHeaders.Add("Authorization", "Bearer DI0YWRhcHRlcjoxMjM0NTY3OHVp");
+
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            return await Client.PostAsJsonAsync("/apiv2/association/create", groupFields);
+        }
+
         public static async Task<HttpResponseMessage> UpdateRecordOnPortal(UpdateRecordOnPortalModel model)
         {
             _client = null;

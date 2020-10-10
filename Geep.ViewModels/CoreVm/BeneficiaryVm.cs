@@ -83,6 +83,8 @@ namespace Geep.ViewModels.CoreVm
         [JsonPropertyName("disability")]
         public string Disability { get; set; }
 
+        public string Position { get; set; }
+
         [JsonPropertyName("smile_reference")]
         public string SmileReference { get; set; }
 

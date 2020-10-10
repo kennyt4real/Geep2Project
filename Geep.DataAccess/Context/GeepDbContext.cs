@@ -116,6 +116,8 @@ namespace Geep.DataAccess.Context
         public DbSet<AgentClusterLocation> AgentClusterLocations { get; set; }
         public DbSet<LocalGovernmentArea> LocalGovernmentAreas { get; set; }
         public DbSet<State> States { get; set; }
+        public DbSet<GroupExco> GroupExcos { get; set; }
+        public DbSet<Document> Documents { get; set; }
 
     }
 }

@@ -17,7 +17,7 @@ using Geep.Common.ExtensionMethods;
 
 namespace Geep.DataAccess.CommandQuery
 {
-    public class BeneficiaryManagement : IBeneficiaryManagement
+    public class EntitiesManagement : IEntitiesManagement
     {
         private IRepo<Beneficiary> _repo;
         private IMapper _mapper;
@@ -27,9 +27,11 @@ namespace Geep.DataAccess.CommandQuery
         private ICrudInteger<ClusterLocationVm> _clusterQuery;
         private ICrudInteger<AgentClusterLocationVm> _agentClusterQuery;
         private ICrudInteger<AgentVm> _agentQuery;
+        private readonly ICrudInteger<AssociationVm> _assoQuery;
 
-        public BeneficiaryManagement(GeepDbContext db, IRepo<Beneficiary> repo, IMapper mapper, ICrudInteger<BeneficiaryVm> beneficiaryQuery, ICrudInteger<AgentVm> agentQuery,
-            ICrudInteger<StateVm> stateQuery, ICrudInteger<ClusterLocationVm> clusterQuery, ICrudInteger<AgentClusterLocationVm> agentClusterQuery)
+        public EntitiesManagement(GeepDbContext db, IRepo<Beneficiary> repo, IMapper mapper, ICrudInteger<BeneficiaryVm> beneficiaryQuery, 
+                                  ICrudInteger<AgentVm> agentQuery, ICrudInteger<StateVm> stateQuery, ICrudInteger<ClusterLocationVm> clusterQuery, 
+                                  ICrudInteger<AgentClusterLocationVm> agentClusterQuery, ICrudInteger<AssociationVm> assoQuery)
         {
             _repo = repo;
             _mapper = mapper;
@@ -39,6 +41,7 @@ namespace Geep.DataAccess.CommandQuery
             _clusterQuery = clusterQuery;
             _agentClusterQuery = agentClusterQuery;
             _agentQuery = agentQuery;
+            _assoQuery = assoQuery;
         }
 
         public async Task<List<BeneficiaryVm>> GetBeneficiaryByAssociationId(int id)
@@ -114,10 +117,95 @@ namespace Geep.DataAccess.CommandQuery
         {
             return _mapper.Map<AssociationVm>(await _db.Associations.AsNoTracking().FirstOrDefaultAsync(x => x.AssociationName.ToUpper().Trim().Equals(groupName.ToUpper().Trim())));
         }
-
-        public async Task PushRecordsToWhiteList()
+        public async Task CreateGroupOnWhiteList()
         {
-            var beneficiaries = _mapper.Map<List<BeneficiaryVm>>(await _db.Beneficiaries.Include(x => x.Agent).Include(x => x.Association).AsNoTracking().Where(x => x.IsApprovedByWhiteList.Equals(false)).ToListAsync());
+            var associations = _mapper.Map<List<AssociationVm>>(await _db.Associations
+                                                                    .Include(x => x.Beneficiaries)
+                                                                    .Include(x => x.LocalGovernmentArea)
+                                                                    .Include(x => x.Document)
+                                                                    .AsNoTracking()
+                                                                    .Where(x => x.IsApprovedByWhiteList.Equals(false))
+                                                                    .ToListAsync());
+
+            foreach (var association in associations)
+            {
+                var groupLga = await _db.LocalGovernmentAreas.Include(x => x.State).AsNoTracking().FirstOrDefaultAsync(x => x.LocalGovernmentAreaId.Equals(association.LocalGovernmentAreaId));
+                var groupField = _mapper.Map<GroupFields>(association);
+                groupField.StateId = groupLga.State.ReferenceId.ToString();
+                groupField.LGAId = groupLga.ReferenceId.ToString();
+                groupField.GroupExcoInformations = _mapper.Map<List<ExcoInformation>>(association.Beneficiaries);
+                foreach (var exco in groupField.GroupExcoInformations)
+                {
+                    var excoLga = await _db.LocalGovernmentAreas.Include(x => x.State).AsNoTracking().FirstOrDefaultAsync(x => x.LocalGovernmentAreaId.Equals(exco.LGAId));
+                    exco.LGAId = excoLga.ReferenceId;
+                    exco.StateId = excoLga.State.ReferenceId;
+                }
+                var groupDoc = association.Document;
+                groupDoc.File = AzureHelper.FromAzureToBase64(groupDoc.File);
+                groupField.Documents = new DocumentVm[] { groupDoc };
+
+                var groupTrades = association.TradeType.Split(',');
+                groupField.GroupTradeTypes = new List<int>();
+                foreach (var item in groupTrades)
+                {
+                    groupField.GroupTradeTypes.Add(int.Parse(item));
+                }
+
+                groupField.EnumeratorIds = new List<int> { int.Parse(association.EnumeratorId) };
+
+                var response = await BOIHelper.PusheToWhiteList(groupField);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    JObject jobj = JObject.Parse(json);
+                    association.PushedToWhiteList = true;
+                    association.DateUpdated = DateTime.UtcNow;
+
+                    if (jobj["status"].ToString() == "200")
+                    {
+                        association.IsApprovedByWhiteList = true;
+                        association.ReferenceKey = jobj["data"]["id"].ToString();
+
+                    }
+                    else if (jobj["status"].ToString() == "401")
+                    {
+                        association.RejectionReason = "Rejected by whitelist for these reasons:" + " " + jobj["message"].ToString();
+                    }
+                    else
+                    {
+
+                        if (jobj["data"] == null || jobj["data"]["id"] == null)
+                        {
+                            association.RejectionReason = "Rejected by whitelist for these reasons:" + " " + jobj["message"].ToString();
+
+                        }
+                    }
+                    association.Agent = null;
+                    association.Document = null;
+                    association.Beneficiaries = null;
+                    await _assoQuery.AddOrUpdate(association);
+                    var updatePortalVm = _mapper.Map<UpdateRecordOnPortalModel>(association);
+                    var updateOnPortalResponse = await BOIHelper.UpdateRecordOnPortal(updatePortalVm);
+                    var portalResponseJson = await updateOnPortalResponse.Content.ReadAsStringAsync();
+                    var portalResponseModel = JsonConvert.DeserializeObject<PortalResponseVm>(portalResponseJson);
+                    if (portalResponseModel.Data)
+                    {
+                        association.IsUpdatedOnPortal = true;
+                        await _assoQuery.AddOrUpdate(association);
+
+                    }
+                }
+            }
+        }
+
+        public async Task PushBeneficiaryRecordsToWhiteList()
+        {
+            var beneficiaries = _mapper.Map<List<BeneficiaryVm>>(await _db.Beneficiaries
+                                                                            .Include(x => x.Agent)
+                                                                            .Include(x => x.Association)
+                                                                            .AsNoTracking()
+                                                                            .Where(x => x.IsApprovedByWhiteList.Equals(false))
+                                                                            .ToListAsync());
             int totalRecordPushed = 0;
             int approvedRecords = 0;
             int rejectedRecords = 0;
@@ -269,6 +357,45 @@ namespace Geep.DataAccess.CommandQuery
             }
             return new ResponseVm { Status = false, Message = "Oops,  Something went wrong" };
         }
+        public async Task<BeneficiaryVm> GetBeneficiaryByPhoneNumber(string phoneNumber)
+        {
+            return _mapper.Map<BeneficiaryVm>(await _db.Beneficiaries.FirstOrDefaultAsync(x => x.PhoneNumber.Equals(phoneNumber)));
+        }
+
+        public async Task AddAssociationDocument(DocumentVm vm)
+        {
+            try
+            {
+                var model = _mapper.Map<Document>(vm);
+                _db.Documents.Add(model);
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        public async Task<int> AddAssociation(AssociationVm vm)
+        {
+            vm.Agent = null;
+            vm.Document = null;
+            vm.Beneficiaries = null;
+            try
+            {
+                var model = _mapper.Map<Association>(vm);
+                _db.Associations.Add(model);
+                await _db.SaveChangesAsync();
+                return model.AssociationId;
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+
+        }
+
         private async Task<bool> AgentIsAlreadyAddedToCluster(int agentId, int clusterId)
         {
             var agentCluster = await _db.AgentClusterLocations.AsNoTracking().FirstOrDefaultAsync(x => x.AgentId.Equals(agentId) && x.ClusterLocationId.Equals(clusterId));
@@ -276,6 +403,8 @@ namespace Geep.DataAccess.CommandQuery
                 return false;
             return true;
         }
+
+
 
     }
 }

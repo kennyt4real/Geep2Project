@@ -12,17 +12,17 @@ using Microsoft.AspNetCore.Mvc;
 namespace Geep.Web.Controllers.ApiController
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/Beneficiary")]
     [Produces("application/json")]
-    public class BeneficiariesApiController : ControllerBase
+    public class BeneficiaryApiController : ControllerBase
     {
         private ICrudInteger<AgentVm> _agentRepo;
-        private IBeneficiaryManagement _beneficiaryQuery;
+        private IEntitiesManagement _beneficiaryQuery;
         private ICrudInteger<AssociationBeneficiaryVm> _assoBenQuery;
         private ICrudInteger<ClusterLocationVm> _clusterQuery;
         private ICrudInteger<BeneficiaryVm> _repo;
 
-        public BeneficiariesApiController(ICrudInteger<AgentVm> agentRepo, ICrudInteger<AssociationBeneficiaryVm> assoBenQuery,IBeneficiaryManagement beneficiaryQuery,
+        public BeneficiaryApiController(ICrudInteger<AgentVm> agentRepo, ICrudInteger<AssociationBeneficiaryVm> assoBenQuery,IEntitiesManagement beneficiaryQuery,
             ICrudInteger<ClusterLocationVm> clusterQuery, ICrudInteger<BeneficiaryVm> repo)
         {
             _agentRepo = agentRepo;
@@ -33,7 +33,7 @@ namespace Geep.Web.Controllers.ApiController
         }
 
         // POST: api/Beneficiary
-        [HttpPost]
+        [HttpPost(nameof(Post))]
         public async Task<IActionResult> Post([FromBody] BeneficiaryVm vm)
         {
             if (ModelState.IsValid)
@@ -91,5 +91,7 @@ namespace Geep.Web.Controllers.ApiController
             return BadRequest(new ResponseVm {Status= false, Message = "Some responses are not Valid" });
 
         }
+
+        
     }
 }

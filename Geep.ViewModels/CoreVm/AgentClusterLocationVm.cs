@@ -30,4 +30,5 @@ namespace Geep.ViewModels.CoreVm
         public string ClusterName { get; set; }
         public string ClusterStateName { get; set; }
     }
+
 }
