@@ -61,9 +61,9 @@
             },
             "columns": [
                 { "data": "BeneficiaryFullName", "autoWidth": true },
-                { "data": "phone", "autoWidth": true },
-                { "data": "date_enumerated", "autoWidth": true },
-                { "data": "AssociationName", "autoWidth": true },
+                { "data": "PhoneNumber", "autoWidth": true },
+                { "data": "DateEnumerated", "autoWidth": true },
+                { "data": "GroupName", "autoWidth": true },
                 { "data": "DisplayForIsPushedToWhiteList", "autoWidth": true },
                 { "data": "DisplayForIsApprovedByWhiteList", "autoWidth": true },
                 { "data": "DisplayForIsUpdatedOnPortal", "autoWidth": true },
@@ -72,15 +72,12 @@
     });
 
     function PushRecordsToWhiteList() {
-        //var url = "/Beneficiaries/PushRecordsToWhiteList";
         $.ajax({
             type: "POST",
             url: "/Beneficiaries/PushRecordsToWhiteList",
             "datatype": "json",
             success: function (data) {
                 if (data.status) {
-                    //window.oTable.ajax.reload(); //run my_fun() ondomready
-                    //$("#myform")[0].reset()
                     toastr.success(data.message);
                 }
                 else {

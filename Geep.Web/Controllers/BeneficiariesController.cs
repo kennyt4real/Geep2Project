@@ -11,6 +11,7 @@ using Geep.ViewModels.CoreVm;
 using Geep.DomainLayer.GeneralAbstractions;
 using Geep.DomainLayer.CustomAbstrations;
 using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
 
 namespace Geep.Web.Controllers
 {
@@ -22,14 +23,16 @@ namespace Geep.Web.Controllers
         private IEntitiesManagement _beneficiaryQuery;
         private ICrudInteger<AgentVm> _agentQuery;
         private ICrudInteger<AssociationVm> _associationQuery;
+        private IMapper _mapper;
 
-        public BeneficiariesController(ICrudInteger<BeneficiaryVm> repo, IEntitiesManagement beneficiaryQuery, 
+        public BeneficiariesController(ICrudInteger<BeneficiaryVm> repo, IEntitiesManagement beneficiaryQuery, IMapper mapper,
                                                 ICrudInteger<AgentVm> agentQuery, ICrudInteger<AssociationVm> associationQuery)
         {
             _repo = repo;
             _beneficiaryQuery = beneficiaryQuery;
             _agentQuery = agentQuery;
             _associationQuery = associationQuery;
+            _mapper = mapper;
         }
 
         public IActionResult Index()
@@ -41,7 +44,7 @@ namespace Geep.Web.Controllers
 
         public async Task<IActionResult> GetIndex()
         {
-            var data = await _repo.GetAll();
+            var data = _mapper.Map<List<BeneFiciayListView>>(await _repo.GetAll());
             return Json(new { data });
         }
 

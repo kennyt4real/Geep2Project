@@ -10,23 +10,32 @@ using Newtonsoft.Json;
 
 namespace Geep.Web.Controllers
 {
-    [Authorize]
-
+    [Route("[controller]")]
     public class BasicController : Controller
     {
-        private readonly ICrudInteger<LocalGovernmentAreaVm> _query;
+        private readonly ICrudInteger<LocalGovernmentAreaVm> _lgaQuery;
         private readonly ICrudInteger<AgentVm> _agentQuery;
         private readonly ICrudInteger<ClusterLocationVm> _clusterQuery;
+        private readonly ICrudInteger<StateVm> _stateQuery;
 
-        public BasicController(ICrudInteger<LocalGovernmentAreaVm> query, ICrudInteger<AgentVm> agentQuery, ICrudInteger<ClusterLocationVm> clusterQuery)
+        public BasicController(ICrudInteger<LocalGovernmentAreaVm> lgaQuery, ICrudInteger<AgentVm> agentQuery, 
+                                ICrudInteger<ClusterLocationVm> clusterQuery, ICrudInteger<StateVm> stateQuery)
         {
-            _query = query;
+            _lgaQuery = lgaQuery;
             _agentQuery = agentQuery;
             _clusterQuery = clusterQuery;
+            _stateQuery = stateQuery;
         }
+        [HttpGet(nameof(GetStateList))]
+        public async Task<IActionResult> GetStateList()
+        {
+            return Json(JsonConvert.SerializeObject(await _stateQuery.GetAll()));
+        }
+
+        [HttpGet(nameof(GetLgaList))]
         public async Task<IActionResult> GetLgaList(int stateId)
         {
-            var data = await _query.GetAllById(stateId);
+            var data = await _lgaQuery.GetAllById(stateId);
 
             return Json(JsonConvert.SerializeObject(data));
         }
