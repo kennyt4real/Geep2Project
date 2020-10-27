@@ -39,12 +39,14 @@ namespace Geep.Web.Controllers
 
             return Json(JsonConvert.SerializeObject(data));
         }
+        [HttpGet(nameof(GetClusterList))]
         public async Task<IActionResult> GetClusterList(int stateId)
         {
             var data = await _clusterQuery.GetAllById(stateId);
 
             return Json(JsonConvert.SerializeObject(data));
         }
+        [HttpGet(nameof(GetAgentList))]
         public async Task<IActionResult> GetAgentList(int stateId)
         {
             var data = await _agentQuery.GetAllById(stateId);

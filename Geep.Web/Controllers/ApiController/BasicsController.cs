@@ -21,6 +21,7 @@ namespace Geep.Web.Controllers.ApiController
             _lgaQuery = lgaQuery;
             _stateQuery = stateQuery;
         }
+        [HttpGet(nameof(GetStateList))]
         public async Task<IActionResult> GetStateList()
         {
             var data = await _stateQuery.GetAll();
@@ -28,6 +29,7 @@ namespace Geep.Web.Controllers.ApiController
                 return Ok(data);
             return BadRequest("Something went wrong");
         }
+        [HttpGet(nameof(GetLgaList))]
         public async Task<IActionResult> GetLgaList(int stateId)
         {
             var data = await _lgaQuery.GetAllById(stateId);
