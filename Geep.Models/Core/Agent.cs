@@ -8,7 +8,7 @@ namespace Geep.Models.Core
     public class Agent : Audit
     {
         public int AgentId { get; set; }
-        [UniqueKey(groupId: "1", order: 0)]
+        [UniqueKey]
         public string ReferenceId { get; set; }
         public string Email { get; set; }
         public string FirstName { get; set; }

@@ -4,14 +4,16 @@ using Geep.DataAccess.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Geep.DataAccess.Migrations
 {
     [DbContext(typeof(GeepDbContext))]
-    partial class GeepDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201029055036_RemovedRefIdFromAssoModelAndReformedUniqPropOnModels")]
+    partial class RemovedRefIdFromAssoModelAndReformedUniqPropOnModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -5,103 +5,74 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Geep.ViewModels.CoreVm
 {
     public class AssociationVm : AuditVm
     {
-        [JsonProperty("group_id")]
         public int AssociationId { get; set; }
+        [JsonPropertyName("group_id")]
+        public int ReferenceId { get; set; }
 
-        [StringLength(12)]
-        [Required]
-        [DisplayName("Association Ref ID")]
-        [JsonProperty("association_id")]
-        public string AssociationRefId { get; set; }
-
-        [Required]
-        [DisplayName("Association Name")]
-        [JsonProperty("asso_name")]
+        [JsonPropertyName("asso_name")]
         public string AssociationName { get; set; }
 
-        [Required]
-        [DisplayName("Association Type")]
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public string AssociationType { get; set; }
 
-        [Required]
-        [DisplayName("State")]
+        [JsonPropertyName("stateid")]
         public int StateId { get; set; }
 
-        public int DocumentId { get; set; }
-
-        [Required]
-        [DisplayName("Local Govt")]
+        [JsonPropertyName("lgaid")]
         public int LocalGovernmentAreaId { get; set; }
 
-        [Required]
-        [DisplayName("Super Agent")]
-        [JsonProperty("super_agent")]
-        public string SuperAgent { get; set; }
-        [Required]
-        [DisplayName("Status")]
-        [JsonProperty("accreditation_status")]
-        public string AccreditationStatus { get; set; }
-
-        [Required]
-        [DisplayName("Group Phonenumber")]
-        [StringLength(11, MinimumLength = 11)]
-        [DataType(DataType.PhoneNumber)]
-        [JsonProperty("group_phone")]
-        public string GroupPhoneNumber { get; set; }
-
-        [Required]
-        [DisplayName("Group Email")]
-        [JsonProperty("group_email")]
-        public string GroupEmail { get; set; }
-
-        [JsonProperty("product_id")]
+        [JsonPropertyName("super_agent")]
+        public string SuperAgent { get; set; }       
+             
+        [JsonPropertyName("product_id")]
         public string ProductId { get; set; }
-        [JsonProperty("address")]
+        [JsonPropertyName("address")]
         public string Address { get; set; }
-        [JsonProperty("mou_status")]
-
         public string MOUStatus { get; set; }
-        [JsonProperty("channel")]
+        [JsonPropertyName("channel")]
         public string Channel { get; set; }
-        [JsonProperty("agentid")]
+        [JsonPropertyName("agentid")]
         public string AgentId { get; set; }
-        [JsonProperty("members_count")]
+        [JsonPropertyName("members_count")]
         public string MemberCount { get; set; }
+        [JsonPropertyName("trade_type")]
         public string TradeType { get; set; }
-        
-        public string EnumeratorId { get; set; }
-      
-        [JsonProperty("enumeratorid")]
+        [JsonPropertyName("enumeratorid")]
+        public string EnumeratorId { get; set; }      
         public string BeneficiaryCount { get; set; }
-        [JsonProperty("leaders_name")]
+        [JsonPropertyName("leaders_name")]
         public string LeaderName { get; set; }
-        [JsonProperty("leaders_phone")]
+        [JsonPropertyName("leaders_phone")]
         public string LeaderPhoneNumber { get; set; }
-        public string CACDoc { get; set; }
-
-        [JsonProperty("docs")]
-
-        public DocumentVm Document { get; set; }
-        [JsonProperty("lgaid")]
-        public string AssociationLga { get; set; }
-        [JsonProperty("stateid")]
-        public string AssociationState { get; set; }
-
-        public List<BeneficiaryVm> Beneficiaries { get; set; }
+        [JsonPropertyName("docs")]
+        public List<DocumentVm> Documents { get; set; }
+        [JsonPropertyName("group_leaders")]
+        public List<CreateBeneficiary> Beneficiaries { get; set; }
+        [JsonPropertyName("agent")]
         public AgentVm Agent { get; set; }
         public bool PushedToWhiteList { get; set; }
         public bool IsApprovedByWhiteList { get; set; }
         public string RejectionReason { get; set; }
         public string ReferenceKey { get; set; }
         public bool IsUpdatedOnPortal { get; set; }
-
-
-
+        public string AssociationState { get; set; }
+        public string AssociationLga { get; set; }
+        public string AccreditationStatus
+        {
+            get
+            {
+                if (IsApprovedByWhiteList)
+                    return "Accredited";
+                if (PushedToWhiteList)
+                    return "Rejected";
+                return "Submitted";
+            }
+        }
     }
 }

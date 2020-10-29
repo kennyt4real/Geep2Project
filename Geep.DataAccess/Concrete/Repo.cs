@@ -96,7 +96,7 @@ namespace Geep.DataAccess.Concrete
             {
                 query = query.Where(filter);
             }
-            return await query.FirstOrDefaultAsync();
+            return await query.AsNoTracking().FirstOrDefaultAsync();
         }
 
         public async Task<T> GetById(int id)

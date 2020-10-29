@@ -24,7 +24,7 @@ namespace Geep.DataAccess.CommandQuery
 
         public async Task<List<BeneficiaryVm>> GetAll()
         {
-            return _mapper.Map<List<BeneficiaryVm>>(await _repo.GetAll($"{nameof(Models.Core.Agent)},{nameof(Association)},{nameof(ClusterLocation)}"));
+            return _mapper.Map<List<BeneficiaryVm>>(await _repo.GetAll($"{nameof(Agent)},{nameof(Association)},{nameof(ClusterLocation)}"));
         }
 
         public async Task<BeneficiaryVm> GetById(int id)

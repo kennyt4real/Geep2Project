@@ -59,7 +59,7 @@ namespace Geep.Web.Controllers
 
         public async Task<IActionResult> GetAssociationMembers(int id)
         {
-            var data = await _beneficiaryQuery.GetBeneficiaryByAssociationId(id);
+            var data = _mapper.Map < List < BeneFiciayListView >>(await _beneficiaryQuery.GetBeneficiaryByAssociationId(id));
             return Json(new { data });
         }
 
@@ -75,7 +75,7 @@ namespace Geep.Web.Controllers
 
         public async Task<IActionResult> GetAgentRecords(int id)
         {
-            var data = await _beneficiaryQuery.GetBeneficiaryByAgentId(id);
+            var data = _mapper.Map<List<BeneFiciayListView>>(await _beneficiaryQuery.GetBeneficiaryByAgentId(id));
             return Json(new { data });
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Geep.DomainLayer.CustomAbstrations;
 using Geep.DomainLayer.GeneralAbstractions;
 using Geep.ViewModels;
@@ -17,40 +18,43 @@ namespace Geep.Web.Controllers.ApiController
     public class BeneficiaryApiController : ControllerBase
     {
         private ICrudInteger<AgentVm> _agentRepo;
-        private IEntitiesManagement _beneficiaryQuery;
+        private IEntitiesManagement _entityQuery;
         private ICrudInteger<AssociationBeneficiaryVm> _assoBenQuery;
         private ICrudInteger<ClusterLocationVm> _clusterQuery;
         private ICrudInteger<BeneficiaryVm> _repo;
+        private IMapper _mapper;
 
-        public BeneficiaryApiController(ICrudInteger<AgentVm> agentRepo, ICrudInteger<AssociationBeneficiaryVm> assoBenQuery,IEntitiesManagement beneficiaryQuery,
-            ICrudInteger<ClusterLocationVm> clusterQuery, ICrudInteger<BeneficiaryVm> repo)
+        public BeneficiaryApiController(ICrudInteger<AgentVm> agentRepo, ICrudInteger<AssociationBeneficiaryVm> assoBenQuery,IEntitiesManagement entityQuery,
+            ICrudInteger<ClusterLocationVm> clusterQuery, ICrudInteger<BeneficiaryVm> repo, IMapper mapper)
         {
             _agentRepo = agentRepo;
-            _beneficiaryQuery = beneficiaryQuery;
+            _entityQuery = entityQuery;
             _assoBenQuery = assoBenQuery;
             _clusterQuery = clusterQuery;
             _repo = repo;
+            _mapper = mapper;
         }
 
         // POST: api/Beneficiary
         [HttpPost(nameof(Post))]
-        public async Task<IActionResult> Post([FromBody] BeneficiaryVm vm)
+        public async Task<IActionResult> Post([FromBody] CreateBeneficiary vm)
         {
             if (ModelState.IsValid)
             {
+
                 int associationId = 0;
-                var agent = await _beneficiaryQuery.GetAgentByReferenceId(vm.Agent.ReferenceId);
+                var agent = await _entityQuery.GetAgentByReferenceId(vm.Agent.ReferenceId);
                 if (agent == null)
                 {
-                    agent = await _beneficiaryQuery.AddAgent(vm.Agent);
+                    agent = await _entityQuery.AddAgent(vm.Agent);
                     if (agent == null)
                     {
                         return BadRequest(new ResponseVm { Status=false, Message = "Agent Not found and Agent creation failed" });
                     }
                 }
-                if (vm.GroupName != null)
+                if (!string.IsNullOrEmpty(vm.GroupName)) 
                 {
-                    var association = await _beneficiaryQuery.GetAssociationByAssociationName(vm.GroupName);
+                    var association = await _entityQuery.GetAssociationByAssociationName(vm.GroupName);
                     if (association != null)
                     {
                         vm.AssociationId = association.AssociationId;
@@ -58,30 +62,37 @@ namespace Geep.Web.Controllers.ApiController
                         //return BadRequest(new ResponseVm {Status = false, Message = "Association not found" });
                     }
                 }
+               
+                var beneficiary =_mapper.Map<BeneficiaryVm>(vm);
                 var clusterLocation = await _clusterQuery.GetByReferenceId(vm.ClusterLocationId);
-                vm.ClusterLocationId = clusterLocation.ClusterLocationId;
-                vm.AgentId = agent.AgentId;
-                vm.Agent = null;
-
+                beneficiary.ClusterLocationId = clusterLocation.ClusterLocationId;
+                beneficiary.AgentId = agent.AgentId;
+                beneficiary.Agent = null;
                 (int beneficiaryId, string message) response = (0, "");
                 //Check if Beneficiary already exist.
                 var beneficaiaryInDb = await _repo.GetByReferenceId(vm.ReferenceId);
                 if (beneficaiaryInDb != null && beneficaiaryInDb.BeneficiaryId > 0) 
                 {
-                    vm.BeneficiaryId = beneficaiaryInDb.BeneficiaryId;
-                    response = await _beneficiaryQuery.UpdateBeneficiary(vm);
+                    beneficiary.BeneficiaryId = beneficaiaryInDb.BeneficiaryId;
+                    response = await _entityQuery.UpdateBeneficiary(beneficiary);
                 }
                 else
                 {
-                    response = await _beneficiaryQuery.AddBeneficiary(vm);
+                    response = await _entityQuery.AddBeneficiary(beneficiary);
                 }
 
                 if (response.beneficiaryId > 0) 
                 {
                     if (associationId > 0)
                     {
-                        var associationBeneficiary = new AssociationBeneficiaryVm { AssociationId = associationId, BeneficiaryId = response.beneficiaryId };
-                        await _assoBenQuery.AddOrUpdate(associationBeneficiary);
+                        //Check if AssociationBeneficiary already exist in DB.
+                        var associationBeneficiary = await _entityQuery.GetAssociationBeneficiary(response.beneficiaryId, associationId);
+                        if (associationBeneficiary == null)
+                        {
+                            associationBeneficiary = new AssociationBeneficiaryVm { AssociationId = associationId, BeneficiaryId = response.beneficiaryId };
+                            await _assoBenQuery.AddOrUpdate(associationBeneficiary);
+
+                        }
                     } 
                     return Ok(new ResponseVm { Status = true, Message = "Record created successfull" });
                 }

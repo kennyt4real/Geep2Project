@@ -23,5 +23,7 @@ namespace Geep.DomainLayer.CustomAbstrations
         Task<int> AddAssociation(AssociationVm vm);
         Task AddAssociationDocument(DocumentVm vm);
         Task<BeneficiaryVm> GetBeneficiaryByPhoneNumber(string phoneNumber);
+        Task<DocumentVm> GetDocumentByFileName(int associationId, string file);
+        Task<AssociationBeneficiaryVm> GetAssociationBeneficiary(int beneficiaryId, int associationId);
     }
 }

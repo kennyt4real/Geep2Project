@@ -4,14 +4,16 @@ using Geep.DataAccess.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Geep.DataAccess.Migrations
 {
     [DbContext(typeof(GeepDbContext))]
-    partial class GeepDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201029051401_RemovedSomeColumsFromAssociationModel")]
+    partial class RemovedSomeColumsFromAssociationModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,7 +117,7 @@ namespace Geep.DataAccess.Migrations
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e513",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "dade2833-0770-4d36-89d4-d2a53f1f4de6",
+                            ConcurrencyStamp = "c0550781-2d54-42fd-87ab-3ff59b40b331",
                             Email = "Admin@geepproject.com",
                             EmailConfirmed = true,
                             IsGoogleAuthenticatorEnabled = false,
@@ -124,7 +126,7 @@ namespace Geep.DataAccess.Migrations
                             NormalizedEmail = "ADMIN@GEEPPROJECT.COM",
                             NormalizedUserName = "ADMIN@GEEPPROJECT.COM",
                             NumberOfLogins = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEFGj2SPFdVGnpHdJXhOuIHSWxgO7b3wwy0+dFrciKT8F4XVlHmW1sEpyYC1KPZY1+w==",
+                            PasswordHash = "AQAAAAEAACcQAAAAELpyvp/dnjDCvAXao0ByjLjcwPN7wf1NGnlr1s+0i7eLQuZrRvAXX+ZP0RGnU2qv+Q==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -134,7 +136,7 @@ namespace Geep.DataAccess.Migrations
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e613",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "df491b8b-1910-4ebd-84a6-f16fac0528b4",
+                            ConcurrencyStamp = "f6b46d4a-7f0e-4542-8de0-59de400e64b2",
                             Email = "SuperAdmin@geepproject.com",
                             EmailConfirmed = true,
                             IsGoogleAuthenticatorEnabled = false,
@@ -143,7 +145,7 @@ namespace Geep.DataAccess.Migrations
                             NormalizedEmail = "SUPERADMIN@GEEPPROJECT.COM",
                             NormalizedUserName = "SUPERADMIN@GEEPPROJECT.COM",
                             NumberOfLogins = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEFB/Jf2w7I+5wDFM4WNiBC6C6RSjpg43qE9IW+KYigav7fL7B+GPOT77uYvSBtd4dw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEAgwuoK5VjM6Tl5rduoqjEBLpasYys1YCA8svt+nJ+hTS30Rn7M3DZB2hcB/zq/yng==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -265,6 +267,10 @@ namespace Geep.DataAccess.Migrations
                     b.Property<string>("AssociationName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("AssociationRefId")
+                        .HasColumnType("nvarchar(12)")
+                        .HasMaxLength(12);
+
                     b.Property<string>("AssociationType")
                         .HasColumnType("nvarchar(max)");
 
@@ -333,10 +339,11 @@ namespace Geep.DataAccess.Migrations
 
                     b.HasKey("AssociationId");
 
-                    b.HasIndex("LocalGovernmentAreaId");
+                    b.HasIndex("AssociationRefId")
+                        .IsUnique()
+                        .HasFilter("[AssociationRefId] IS NOT NULL");
 
-                    b.HasIndex("ReferenceId")
-                        .IsUnique();
+                    b.HasIndex("LocalGovernmentAreaId");
 
                     b.ToTable("Associations");
                 });
@@ -770,21 +777,21 @@ namespace Geep.DataAccess.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e513",
-                            ConcurrencyStamp = "e2bb5eac-ccfa-4f76-b639-4969029b0cdc",
+                            ConcurrencyStamp = "edbc1727-4ce1-4f75-8af8-fa976caed61c",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e613",
-                            ConcurrencyStamp = "7f1da16f-730b-4c41-9e0c-7886efa84abb",
+                            ConcurrencyStamp = "645477ef-3f58-4b15-9c5a-2029fd6f8479",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "a18be9c0-aak5-4af8-bd17-00bd934nfn13",
-                            ConcurrencyStamp = "bd1cef9e-4459-41c3-8731-192d82675356",
+                            ConcurrencyStamp = "7fe45d70-33cc-4102-a63d-e9847a38e4b5",
                             Name = "QualityControl",
                             NormalizedName = "QUALITYCONTROL"
                         });

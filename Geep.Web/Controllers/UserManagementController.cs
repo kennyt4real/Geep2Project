@@ -70,8 +70,8 @@ namespace Geep.Web.Controllers
                 if (result.Succeeded)
                 {
                     await _emailService.SendEmailAsync(vm.Email, "GEEP Dashboard",
-                    $"A user account has been created with your email address on the GEEP Dashbpoard." +
-                    $" and the password to the account is  <b>{_tempPassword}</b>. Click this link https://geepdashboard.azurewebsites.net to login ");
+                    $"A user account has been created with your email address on GEEP Dashbpoard.<br/>" +
+                    $"Your the password to the account is  <b>{_tempPassword}</b>. <br/>Click this link https://mfa-geep.azurewebsites.net to login ");
                 }
               
 

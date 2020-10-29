@@ -15,9 +15,9 @@
                 }
 
                 <div class="col-md-6 form-group">
-                    <label asp-for="AssociationRefId" class="control-label"></label>
-                    <input asp-for="AssociationRefId" class="form-control" />
-                    <span asp-validation-for="AssociationRefId" class="text-danger"></span>
+                    <label asp-for="ReferenceId" class="control-label"></label>
+                    <input asp-for="ReferenceId" class="form-control" />
+                    <span asp-validation-for="ReferenceId" class="text-danger"></span>
                 </div>
                 <div class="col-md-6 form-group">
                     <label asp-for="AssociationName" class="control-label"></label>
@@ -42,17 +42,6 @@
                     <select asp-for="AccreditationStatus" class="form-control" asp-items="ViewBag.Status">
                         <option>--Select Status--</option>
                     </select>
-                </div>
-                <div class="col-md-6 form-group">
-                    <label asp-for="GroupPhoneNumber" class="control-label"></label>
-                    <input asp-for="GroupPhoneNumber" class="form-control">
-                    <span asp-validation-for="GroupPhoneNumber" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-6 form-group">
-                    <label asp-for="GroupEmail" class="control-label"></label>
-                    <input asp-for="GroupEmail" class="form-control">
-                    <span asp-validation-for="GroupEmail" class="text-danger"></span>
                 </div>
 
                 <div class="col-md-6 form-group">

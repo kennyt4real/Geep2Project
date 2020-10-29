@@ -75,7 +75,7 @@ namespace Geep.ViewModels
         [JsonProperty("error_message")]
         public string ErrorMessage { get; set; }
         [JsonProperty("data")]
-        public AgentVm Agent { get; set; }
+        public User UserDetails { get; set; }
     }
 
     public class AddUserToClusterModel
@@ -83,17 +83,29 @@ namespace Geep.ViewModels
         public string Emails { get; set; }
         public string Clusters { get; set; }
     }
+    public class User
+    {
+        public int Id { get; set; }
+        [JsonProperty("first_name")]
+        public string FirstName { get; set; }
+        [JsonProperty("last_name")]
+        public string LastName { get; set; }                
+        [JsonProperty("gender")]
+        public string Gender { get; set; }                
+        [JsonProperty("address")]
+        public string Address { get; set; }                
+        [JsonProperty("email")]
+        public string Email { get; set; }     
+        public long AccountNumber { get; set; }
+        public string BankName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Country { get; set; }
+        public string State { get; set; }
+               
+        [JsonProperty("bvn_number")]
+        public string BVNNumber { get; set; }
+        public string ReferenceId { get; set; }
 
-    //public int AgentId { get; set; }
-    //[UniqueKey(groupId: "1", order: 0)]
-    //public string ReferenceId { get; set; }
-    //public string FirstName { get; set; }
-    //public string LastName { get; set; }
-    //public string MiddleName { get; set; }
-    //public string Gender { get; set; }
-    //public DateTime? DateOfBirth { get; set; }
-    //public string BVN { get; set; }
-    //public string PhoneNumber { get; set; }
-    //public int LocalGovtRefId { get; set; }
-    //public string HomeAddress { get; set; }
+        
+    }
 }

@@ -39,6 +39,7 @@ namespace Geep.Web
             services.AddScoped(typeof(ICrudInteger<LocalGovernmentAreaVm>), typeof(LocalGovernmentAreaCQ));
             services.AddScoped(typeof(IEntitiesManagement), typeof(EntitiesManagement));
             services.AddScoped(typeof(ICrudInteger<StateVm>), typeof(StateCQ));
+            services.AddScoped(typeof(ICrudInteger<DocumentVm>), typeof(DocumentCQ));
 
             services.AddHttpContextAccessor();
 

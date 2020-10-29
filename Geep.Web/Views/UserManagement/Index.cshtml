@@ -3,12 +3,12 @@
     ViewData["Title"] = "Application User";
 }
 
-    <nav class="page-breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="AdminDashboard">DashBoard</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Users</li>
-        </ol>
-    </nav>
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="AdminDashboard">DashBoard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Users</li>
+    </ol>
+</nav>
 
 <div class="col-md-12 grid-margin stretch-card">
     <div class="card">
@@ -22,7 +22,7 @@
                 </div>
             </div>
             <br />
-            <br />         
+            <br />
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -56,8 +56,10 @@
     </div>
 </div>
 
-<script type="text/javascript">
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 
+<script type="text/javascript">
     function AddNew() {
         var url = "/UserManagement/Save?id=0";
         $('#myModalDivBody').load(url,

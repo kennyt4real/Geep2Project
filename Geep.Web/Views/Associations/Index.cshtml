@@ -35,8 +35,9 @@
                                 <th>Reference ID</th>
                                 <th>Group Name</th>
                                 <th>Group Type</th>
-                                <th>Group Eamil</th>
-                                <th>Accreditation Status</th>
+                                <th>Group Lead</th>
+                                <th>Leader Phone Number</th>
+                                <th>Status</th>
                                 @*<th>Action</th>*@
                             </tr>
                         </thead>
@@ -62,10 +63,11 @@
                 "datatype": "json",
             },
             "columns": [
-                { "data": "AssociationRefId", "autoWidth": true },
-                { "data": "AssociationName", "autoWidth": true },
-                { "data": "AssociationType", "autoWidth": true },
-                { "data": "GroupEmail", "autoWidth": true },
+                { "data": "group_id", "autoWidth": true },
+                { "data": "asso_name", "autoWidth": true },
+                { "data": "type", "autoWidth": true },
+                { "data": "leaders_name", "autoWidth": true },
+                { "data": "leaders_phone", "autoWidth": true },
                 { "data": "AccreditationStatus", "autoWidth": true },
                 //{
                 //    "data": "AssociationId",

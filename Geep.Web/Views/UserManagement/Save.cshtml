@@ -29,10 +29,10 @@
                     <input asp-for="LastName" class="form-control">
                     <span asp-validation-for="LastName" class="text-danger"></span>
                 </div>
-
-                <div class="col-md-12 form-group">
-                    <label asp-for="RoleName" class="control-label"></label>
-                    <select asp-for="RoleName" class="form-control" multiple="multiple" asp-items="ViewBag.RoleName">
+               
+                <div class="col-md-12 ">
+                    <label asp-for="RoleName" class="control-label"></label><br/>
+                    <select asp-for="RoleName" class="js-example-basic-multiple form-control" multiple="multiple" asp-items="ViewBag.RoleName">
                         <option value="">--Select Role(s)--</option>
                     </select>
                     <span asp-validation-for="RoleName" class="text-danger"></span>
@@ -59,6 +59,10 @@
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 
 <script>
+    $(document).ready(function () {
+
+        $('.js-example-basic-multiple').select2();
+    });
 
     $("#myEditform").submit(function (e) {
         e.preventDefault();

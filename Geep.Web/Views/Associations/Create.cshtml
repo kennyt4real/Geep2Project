@@ -12,11 +12,7 @@
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="AssociationRefId" class="control-label"></label>
-                <input asp-for="AssociationRefId" class="form-control" />
-                <span asp-validation-for="AssociationRefId" class="text-danger"></span>
-            </div>
+           
             <div class="form-group">
                 <label asp-for="AssociationName" class="control-label"></label>
                 <input asp-for="AssociationName" class="form-control" />
@@ -41,17 +37,8 @@
                 <label asp-for="AccreditationStatus" class="control-label"></label>
                 <input asp-for="AccreditationStatus" class="form-control" />
                 <span asp-validation-for="AccreditationStatus" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="GroupPhoneNumber" class="control-label"></label>
-                <input asp-for="GroupPhoneNumber" class="form-control" />
-                <span asp-validation-for="GroupPhoneNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="GroupEmail" class="control-label"></label>
-                <input asp-for="GroupEmail" class="form-control" />
-                <span asp-validation-for="GroupEmail" class="text-danger"></span>
-            </div>
+            </div>         
+           
             <div class="form-group">
                 <label asp-for="CreatedBy" class="control-label"></label>
                 <input asp-for="CreatedBy" class="form-control" />

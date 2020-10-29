@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Geep.Common.ExtensionMethods;
+using System.Text;
 
 namespace Geep.DataAccess.CommandQuery
 {
@@ -27,11 +28,15 @@ namespace Geep.DataAccess.CommandQuery
         private ICrudInteger<ClusterLocationVm> _clusterQuery;
         private ICrudInteger<AgentClusterLocationVm> _agentClusterQuery;
         private ICrudInteger<AgentVm> _agentQuery;
+        private readonly ICrudInteger<LocalGovernmentAreaVm> _lgaQuery;
         private readonly ICrudInteger<AssociationVm> _assoQuery;
+        private readonly IEmailSender _emailService;
+        private readonly IUserContext _userContext;
 
-        public EntitiesManagement(GeepDbContext db, IRepo<Beneficiary> repo, IMapper mapper, ICrudInteger<BeneficiaryVm> beneficiaryQuery, 
-                                  ICrudInteger<AgentVm> agentQuery, ICrudInteger<StateVm> stateQuery, ICrudInteger<ClusterLocationVm> clusterQuery, 
-                                  ICrudInteger<AgentClusterLocationVm> agentClusterQuery, ICrudInteger<AssociationVm> assoQuery)
+        public EntitiesManagement(GeepDbContext db, IRepo<Beneficiary> repo, IMapper mapper, ICrudInteger<BeneficiaryVm> beneficiaryQuery,
+                                  ICrudInteger<AgentVm> agentQuery, ICrudInteger<StateVm> stateQuery, ICrudInteger<ClusterLocationVm> clusterQuery,
+                                  ICrudInteger<AgentClusterLocationVm> agentClusterQuery, ICrudInteger<LocalGovernmentAreaVm> lgaQuery,
+                                  ICrudInteger<AssociationVm> assoQuery, IEmailSender emailService, IUserContext userContext)
         {
             _repo = repo;
             _mapper = mapper;
@@ -41,7 +46,10 @@ namespace Geep.DataAccess.CommandQuery
             _clusterQuery = clusterQuery;
             _agentClusterQuery = agentClusterQuery;
             _agentQuery = agentQuery;
+            _lgaQuery = lgaQuery;
             _assoQuery = assoQuery;
+            _emailService = emailService;
+            _userContext = userContext;
         }
 
         public async Task<List<BeneficiaryVm>> GetBeneficiaryByAssociationId(int id)
@@ -81,6 +89,11 @@ namespace Geep.DataAccess.CommandQuery
         {
             try
             {
+                if (vm.LGAId > 0)
+                {
+                    var lga = await _lgaQuery.GetByReferenceId(vm.LGAId);
+                    vm.LGAId = lga.LocalGovernmentAreaId;
+                }
                 var model = _mapper.Map<Beneficiary>(vm);
                 model.DateCreated = DateTime.Now;
 
@@ -99,6 +112,11 @@ namespace Geep.DataAccess.CommandQuery
         {
             try
             {
+                if (vm.LGAId > 0)
+                {
+                    var lga = await _lgaQuery.GetByReferenceId(vm.LGAId);
+                    vm.LGAId = lga.LocalGovernmentAreaId;
+                }
                 var model = _mapper.Map<Beneficiary>(vm);
                 model.DateUpdated = DateTime.Now;
 
@@ -126,7 +144,9 @@ namespace Geep.DataAccess.CommandQuery
                                                                     .AsNoTracking()
                                                                     .Where(x => x.IsApprovedByWhiteList.Equals(false))
                                                                     .ToListAsync());
-
+            int totalRecordPushed = 0;
+            int approvedRecords = 0;
+            int rejectedRecords = 0;
             foreach (var association in associations)
             {
                 var groupLga = await _db.LocalGovernmentAreas.Include(x => x.State).AsNoTracking().FirstOrDefaultAsync(x => x.LocalGovernmentAreaId.Equals(association.LocalGovernmentAreaId));
@@ -140,7 +160,7 @@ namespace Geep.DataAccess.CommandQuery
                     exco.LGAId = excoLga.ReferenceId;
                     exco.StateId = excoLga.State.ReferenceId;
                 }
-                var groupDoc = association.Document;
+                var groupDoc = association.Documents.FirstOrDefault(x => x.FileType.Equals("mou"));
                 groupDoc.File = AzureHelper.FromAzureToBase64(groupDoc.File);
                 groupField.Documents = new DocumentVm[] { groupDoc };
 
@@ -156,6 +176,7 @@ namespace Geep.DataAccess.CommandQuery
                 var response = await BOIHelper.PusheToWhiteList(groupField);
                 if (response.IsSuccessStatusCode)
                 {
+                    totalRecordPushed = totalRecordPushed + 1;
                     var json = await response.Content.ReadAsStringAsync();
                     JObject jobj = JObject.Parse(json);
                     association.PushedToWhiteList = true;
@@ -163,12 +184,14 @@ namespace Geep.DataAccess.CommandQuery
 
                     if (jobj["status"].ToString() == "200")
                     {
+                        approvedRecords = approvedRecords + 1;
                         association.IsApprovedByWhiteList = true;
                         association.ReferenceKey = jobj["data"]["id"].ToString();
 
                     }
                     else if (jobj["status"].ToString() == "401")
                     {
+                        rejectedRecords = rejectedRecords + 1;
                         association.RejectionReason = "Rejected by whitelist for these reasons:" + " " + jobj["message"].ToString();
                     }
                     else
@@ -181,7 +204,7 @@ namespace Geep.DataAccess.CommandQuery
                         }
                     }
                     association.Agent = null;
-                    association.Document = null;
+                    association.Documents = null;
                     association.Beneficiaries = null;
                     await _assoQuery.AddOrUpdate(association);
                     var updatePortalVm = _mapper.Map<UpdateRecordOnPortalModel>(association);
@@ -196,6 +219,11 @@ namespace Geep.DataAccess.CommandQuery
                     }
                 }
             }
+            await _emailService.SendEmailAsync(_userContext.GetUserEmail(), "Pushed Records Summary",
+                                           $"Summary of the records pushed to the whitelist is as follows.<br/>" +
+                                           $"Total pushed records: {totalRecordPushed}.<br/>" +
+                                           $"Approved records: {approvedRecords}.<br/>" +
+                                           $"Rejected records: {rejectedRecords}.<br/>");
         }
 
         public async Task PushBeneficiaryRecordsToWhiteList()
@@ -273,11 +301,13 @@ namespace Geep.DataAccess.CommandQuery
                         await _beneficiaryQuery.AddOrUpdate(beneficiary);
 
                     }
-
-
-
                 }
             }
+            await _emailService.SendEmailAsync(_userContext.GetUserEmail(), "Pushed Records Summary",
+                                           $"Summary of the records pushed to the whitelist is as follows.<br/>" +
+                                           $"Total pushed records: {totalRecordPushed}.<br/>" +
+                                           $"Approved records: {approvedRecords}.<br/>" +
+                                           $"Rejected records: {rejectedRecords}.<br/>");
         }
         public async Task<List<GeepAgent>> GetGeepAgents()
         {
@@ -305,7 +335,7 @@ namespace Geep.DataAccess.CommandQuery
                         emails.Add(agent.Email);
                     foreach (var clusterId in vm.ClusterLocationIds)
                     {
-                        var cluster = await _clusterQuery.GetByReferenceId(clusterId);
+                        var cluster = await _clusterQuery.GetById(clusterId);
 
                         if (cluster != null && !await AgentIsAlreadyAddedToCluster(agent.AgentId, cluster.ClusterLocationId))
                         {
@@ -322,15 +352,15 @@ namespace Geep.DataAccess.CommandQuery
                     var agentResponse = await BOIHelper.GetUserById(userId);
                     var agentResponsJson = await agentResponse.Content.ReadAsStringAsync();
                     var portalAgent = JsonConvert.DeserializeObject<PortalAgent>(agentResponsJson);
-                    portalAgent.Agent.ReferenceId = "MOB" + "-" + portalAgent.Agent.Id.ToString().PadLeft(5, '0');
-                    agent = await AddAgent(portalAgent.Agent);
+                    portalAgent.UserDetails.ReferenceId = "MOB" + "-" + portalAgent.UserDetails.Id.ToString().PadLeft(5, '0');
+                    agent = await AddAgent(_mapper.Map<AgentVm>(portalAgent.UserDetails));
                     if (agent != null)
                     {
                         if (!emails.Contains(agent.Email))
                             emails.Add(agent.Email);
                         foreach (var clusterId in vm.ClusterLocationIds)
                         {
-                            var cluster = await _clusterQuery.GetByReferenceId(clusterId);
+                            var cluster = await _clusterQuery.GetById(clusterId);
                             if (cluster != null)
                             {
                                 if (!clusters.Contains(cluster.Name))
@@ -344,22 +374,51 @@ namespace Geep.DataAccess.CommandQuery
                     }
                 }
             }
-            var res = await BOIHelper.AddUsersToClusters(new AddUserToClusterModel
+            if (emails.Any() && clusters.Any())
             {
-                Emails = string.Join(",", emails.ToArray()).ToLower().Remove(' ', '-'),
-                Clusters = string.Join(",", clusters.ToArray()).ToLower().Remove(' ', '-')
-            });
-            var resJson = await res.Content.ReadAsStringAsync();
-            var portalRes = JsonConvert.DeserializeObject<PortalAgent>(resJson);
-            if (portalRes.StatusCode.Equals(200))
-            {
-                return new ResponseVm { Status = true, Message = "Agents Added to Clusters Successfully..." };
+                try
+                {
+                    var emailString = new StringBuilder();
+                    var clusterString = new StringBuilder();
+                    foreach (var email in emails)
+                    {
+                        emailString.Append(email.ToLower());
+                        if (emails.IndexOf(email) == emails.Count() - 1)
+                            continue;
+                        emailString.Append(',');
+                    }
+                    foreach (var cluster in clusters)
+                    {
+                        clusterString.Append(cluster.ToLower());
+                        if (cluster.IndexOf(cluster) == clusters.Count() - 1)
+                            continue;
+                        clusterString.Append(',');
+                    }
+                    var res = await BOIHelper.AddUsersToClusters(new AddUserToClusterModel
+                    {
+                        Emails = emailString.ToString(),
+                        Clusters = clusterString.ToString()
+                    }); ;
+                    var resJson = await res.Content.ReadAsStringAsync();
+                    var portalRes = JsonConvert.DeserializeObject<PortalAgent>(resJson);
+                    if (portalRes.StatusCode.Equals(200))
+                    {
+                        return new ResponseVm { Status = true, Message = "Agents Added to Clusters Successfully..." };
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    throw;
+                }
+                
             }
+
             return new ResponseVm { Status = false, Message = "Oops,  Something went wrong" };
         }
         public async Task<BeneficiaryVm> GetBeneficiaryByPhoneNumber(string phoneNumber)
         {
-            return _mapper.Map<BeneficiaryVm>(await _db.Beneficiaries.FirstOrDefaultAsync(x => x.PhoneNumber.Equals(phoneNumber)));
+            return _mapper.Map<BeneficiaryVm>(await _db.Beneficiaries.AsNoTracking().FirstOrDefaultAsync(x => x.PhoneNumber.Equals(phoneNumber)));
         }
 
         public async Task AddAssociationDocument(DocumentVm vm)
@@ -377,9 +436,6 @@ namespace Geep.DataAccess.CommandQuery
         }
         public async Task<int> AddAssociation(AssociationVm vm)
         {
-            vm.Agent = null;
-            vm.Document = null;
-            vm.Beneficiaries = null;
             try
             {
                 var model = _mapper.Map<Association>(vm);
@@ -395,6 +451,36 @@ namespace Geep.DataAccess.CommandQuery
 
 
         }
+        public async Task<DocumentVm> GetDocumentByFileName(int associationId, string file)
+        {
+            try
+            {
+                return _mapper.Map<DocumentVm>(await _db.Documents.FirstOrDefaultAsync(x => x.AssociationId.Equals(associationId) && x.File.Equals(file)));
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+        public async Task<AssociationBeneficiaryVm> GetAssociationBeneficiary(int beneficiaryId, int associationId)
+        {
+            try
+            {
+                return _mapper.Map<AssociationBeneficiaryVm>(await _db.AssociationBeneficiaries
+                                                        .FirstOrDefaultAsync(x => x.BeneficiaryId.Equals(beneficiaryId)
+                                                        && x.AssociationId.Equals(associationId)));
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+
+
 
         private async Task<bool> AgentIsAlreadyAddedToCluster(int agentId, int clusterId)
         {

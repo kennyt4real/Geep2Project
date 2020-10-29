@@ -75,7 +75,12 @@ namespace Geep.DomainLayer.Mapper
             CreateMap<BeneficiaryVm, BeneFiciayListView>();
 
             CreateMap<AssociationVm, GroupFields>();
+
+            CreateMap<CreateBeneficiary, BeneficiaryVm>();
+            CreateMap<Beneficiary, CreateBeneficiary>();
+            CreateMap<User, AgentVm>();
+
         }
-        
+
     }
 }

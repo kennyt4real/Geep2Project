@@ -22,7 +22,7 @@ namespace Geep.Web.Controllers
         private ICrudInteger<StateVm> _stateQuery;
         private readonly ICrudInteger<AgentVm> _agentQuery;
         private readonly ICrudInteger<ClusterLocationVm> _clusterQuery;
-        private readonly IEntitiesManagement _beneficiaryQuery;
+        private readonly IEntitiesManagement _entitiesManagement;
 
         public AgentClusterLocationsController(ICrudInteger<AgentClusterLocationVm> repo, ICrudInteger<StateVm> stateQuery, IEntitiesManagement beneficiaryQuery, 
                                             ICrudInteger<AgentVm> agentQuery, ICrudInteger<ClusterLocationVm> clusterQuery )
@@ -31,12 +31,12 @@ namespace Geep.Web.Controllers
             _stateQuery = stateQuery;
             _agentQuery = agentQuery;
             _clusterQuery = clusterQuery;
-            _beneficiaryQuery = beneficiaryQuery;
+            _entitiesManagement = beneficiaryQuery;
         }
 
         public async  Task<IActionResult> Index()
         {
-            var agents = await _beneficiaryQuery.GetGeepAgents();
+            var agents = await _entitiesManagement.GetGeepAgents();
 
 
             ViewData["StateId"] = new SelectList(await _stateQuery.GetAll(), "StateId", "StateName");
@@ -65,7 +65,7 @@ namespace Geep.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _beneficiaryQuery.AddAgentsToClusters(vm);
+                var response = await _entitiesManagement.AddAgentsToClusters(vm);
                 return Json(new { status = response.Status, message = response.Message });
             }
             string errorMessages = string.Join("; ", ModelState.Values

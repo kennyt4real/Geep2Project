@@ -22,7 +22,7 @@ namespace Geep.Models.Core
         public string MiddleName { get; set; }
         public string Gender { get; set; }
         public string DateOfBirth { get; set; }        
-        [UniqueKey(groupId: "1", order: 0)]
+        [UniqueKey]
         [StringLength(11)]
         public string PhoneNumber { get; set; }
         public string BVN { get; set; }       

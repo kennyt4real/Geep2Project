@@ -32,7 +32,7 @@ namespace Geep.DataAccess.CommandQuery
         }
         public async Task<AssociationVm> GetByReferenceId(int refId)
         {
-            return _mapper.Map<AssociationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x => x.AssociationRefId.Equals(refId), ""));
+            return _mapper.Map<AssociationVm>(await _repo.GetFirstOrDeafultWithNoTracking(x => x.ReferenceId.Equals(refId), ""));
         }
 
         public async Task<ResponseVm> AddOrUpdate(AssociationVm vm)
