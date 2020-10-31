@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Geep.Web.Models;
 using Geep.ViewModels.Constants;
 using Microsoft.AspNetCore.Authorization;
+using Geep.DomainLayer.GeneralAbstractions;
+using Geep.ViewModels.CoreVm;
 
 namespace Geep.Web.Controllers
 {
@@ -15,18 +17,28 @@ namespace Geep.Web.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ICrudInteger<BeneficiaryVm> _benQuery;
+        private readonly ICrudInteger<AgentVm> _agentQuery;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ICrudInteger<BeneficiaryVm> benQuery, ICrudInteger<AgentVm> agentQuery)
         {
             _logger = logger;
+            _benQuery = benQuery;
+            _agentQuery = agentQuery;
         }
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction(nameof(AdminDashboard));
         }
-        public IActionResult AdminDashboard()
+        public async Task<IActionResult> AdminDashboard()
         {
+            var beneficiaries = await _benQuery.GetAll();
+            var agents = await _agentQuery.GetAll();
+            ViewBag.BeneficiaryCount = beneficiaries.Count();
+            ViewBag.ApprovedRecords = beneficiaries.Where(x=>x.IsApprovedByWhiteList.Equals(true)).Count();
+            ViewBag.RejectedRecords = beneficiaries.Where(x=>x.PushedToWhiteList.Equals(true) && x.IsApprovedByWhiteList.Equals(false)).Count();
+            ViewBag.AgentsCount = agents.Count();
             return View();
         }
 

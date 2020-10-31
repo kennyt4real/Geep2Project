@@ -376,42 +376,34 @@ namespace Geep.DataAccess.CommandQuery
             }
             if (emails.Any() && clusters.Any())
             {
-                try
-                {
-                    var emailString = new StringBuilder();
-                    var clusterString = new StringBuilder();
-                    foreach (var email in emails)
-                    {
-                        emailString.Append(email.ToLower());
-                        if (emails.IndexOf(email) == emails.Count() - 1)
-                            continue;
-                        emailString.Append(',');
-                    }
-                    foreach (var cluster in clusters)
-                    {
-                        clusterString.Append(cluster.ToLower());
-                        if (cluster.IndexOf(cluster) == clusters.Count() - 1)
-                            continue;
-                        clusterString.Append(',');
-                    }
-                    var res = await BOIHelper.AddUsersToClusters(new AddUserToClusterModel
-                    {
-                        Emails = emailString.ToString(),
-                        Clusters = clusterString.ToString()
-                    }); ;
-                    var resJson = await res.Content.ReadAsStringAsync();
-                    var portalRes = JsonConvert.DeserializeObject<PortalAgent>(resJson);
-                    if (portalRes.StatusCode.Equals(200))
-                    {
-                        return new ResponseVm { Status = true, Message = "Agents Added to Clusters Successfully..." };
-                    }
-                }
-                catch (Exception ex)
-                {
 
-                    throw;
+                var emailString = new StringBuilder();
+                var clusterString = new StringBuilder();
+                foreach (var email in emails)
+                {
+                    emailString.Append(email.ToLower());
+                    if (emails.IndexOf(email) == emails.Count() - 1)
+                        continue;
+                    emailString.Append(',');
                 }
-                
+                foreach (var cluster in clusters)
+                {
+                    clusterString.Append(cluster.ToLower());
+                    if (cluster.IndexOf(cluster) == clusters.Count() - 1)
+                        continue;
+                    clusterString.Append(',');
+                }
+                var res = await BOIHelper.AddUsersToClusters(new AddUserToClusterModel
+                {
+                    Emails = emailString.ToString(),
+                    Clusters = clusterString.ToString()
+                }); ;
+                var resJson = await res.Content.ReadAsStringAsync();
+                var portalRes = JsonConvert.DeserializeObject<PortalAgent>(resJson);
+                if (portalRes.StatusCode.Equals(200))
+                {
+                    return new ResponseVm { Status = true, Message = "Agents Added to Clusters Successfully..." };
+                }
             }
 
             return new ResponseVm { Status = false, Message = "Oops,  Something went wrong" };
