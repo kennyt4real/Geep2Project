@@ -14,12 +14,12 @@ namespace Geep.DomainLayer.CustomAbstrations
         Task<AgentVm> GetAgentByReferenceId(string id);
         Task<AgentVm> AddAgent(AgentVm vm);
         Task<AssociationVm> GetAssociationByAssociationName(string groupName);
-        Task PushBeneficiaryRecordsToWhiteList();
+        Task PushBeneficiaryRecordsToWhiteList(string userEmail);
         Task<(int beneficiaryId, string message)> AddBeneficiary(BeneficiaryVm vm);
         Task<List<GeepAgent>> GetGeepAgents();
         Task<(int beneficiaryId, string message)> UpdateBeneficiary(BeneficiaryVm vm);
         Task<ResponseVm> AddAgentsToClusters(AgentClusterLocationVm vm);
-        Task CreateGroupOnWhiteList();
+        Task CreateGroupOnWhiteList(string userEmail);
         Task<int> AddAssociation(AssociationVm vm);
         Task AddAssociationDocument(DocumentVm vm);
         Task<BeneficiaryVm> GetBeneficiaryByPhoneNumber(string phoneNumber);

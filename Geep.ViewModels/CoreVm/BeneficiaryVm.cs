@@ -71,7 +71,7 @@ namespace Geep.ViewModels.CoreVm
         [JsonPropertyName("facial_picture")]
         public string FacialPicture { get; set; }
 
-        [JsonPropertyName("group_name")]
+        [JsonPropertyName("groupname")]
         public string GroupName { get; set; }
 
         [JsonPropertyName("picture")]

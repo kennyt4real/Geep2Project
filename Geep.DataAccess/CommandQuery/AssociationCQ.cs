@@ -22,7 +22,7 @@ namespace Geep.DataAccess.CommandQuery
 
         public async Task<List<AssociationVm>> GetAll()
         {
-            return _mapper.Map<List<AssociationVm>>(await _repo.GetAll($"{nameof(LocalGovernmentArea)}.{nameof(State)},{nameof(Document)}"));
+            return _mapper.Map<List<AssociationVm>>(await _repo.GetAll($"{nameof(LocalGovernmentArea)}.{nameof(State)}"));
         }
 
         public async Task<AssociationVm> GetById(int id)

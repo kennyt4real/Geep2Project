@@ -31,12 +31,11 @@ namespace Geep.DataAccess.CommandQuery
         private readonly ICrudInteger<LocalGovernmentAreaVm> _lgaQuery;
         private readonly ICrudInteger<AssociationVm> _assoQuery;
         private readonly IEmailSender _emailService;
-        private readonly IUserContext _userContext;
 
         public EntitiesManagement(GeepDbContext db, IRepo<Beneficiary> repo, IMapper mapper, ICrudInteger<BeneficiaryVm> beneficiaryQuery,
                                   ICrudInteger<AgentVm> agentQuery, ICrudInteger<StateVm> stateQuery, ICrudInteger<ClusterLocationVm> clusterQuery,
                                   ICrudInteger<AgentClusterLocationVm> agentClusterQuery, ICrudInteger<LocalGovernmentAreaVm> lgaQuery,
-                                  ICrudInteger<AssociationVm> assoQuery, IEmailSender emailService, IUserContext userContext)
+                                  ICrudInteger<AssociationVm> assoQuery, IEmailSender emailService)
         {
             _repo = repo;
             _mapper = mapper;
@@ -49,7 +48,6 @@ namespace Geep.DataAccess.CommandQuery
             _lgaQuery = lgaQuery;
             _assoQuery = assoQuery;
             _emailService = emailService;
-            _userContext = userContext;
         }
 
         public async Task<List<BeneficiaryVm>> GetBeneficiaryByAssociationId(int id)
@@ -135,98 +133,117 @@ namespace Geep.DataAccess.CommandQuery
         {
             return _mapper.Map<AssociationVm>(await _db.Associations.AsNoTracking().FirstOrDefaultAsync(x => x.AssociationName.ToUpper().Trim().Equals(groupName.ToUpper().Trim())));
         }
-        public async Task CreateGroupOnWhiteList()
+        public async Task CreateGroupOnWhiteList(string userEmail)
         {
             var associations = _mapper.Map<List<AssociationVm>>(await _db.Associations
                                                                     .Include(x => x.Beneficiaries)
                                                                     .Include(x => x.LocalGovernmentArea)
-                                                                    .Include(x => x.Document)
+                                                                    .Include(x => x.Documents)
                                                                     .AsNoTracking()
                                                                     .Where(x => x.IsApprovedByWhiteList.Equals(false))
                                                                     .ToListAsync());
             int totalRecordPushed = 0;
             int approvedRecords = 0;
             int rejectedRecords = 0;
-            foreach (var association in associations)
+            try
             {
-                var groupLga = await _db.LocalGovernmentAreas.Include(x => x.State).AsNoTracking().FirstOrDefaultAsync(x => x.LocalGovernmentAreaId.Equals(association.LocalGovernmentAreaId));
-                var groupField = _mapper.Map<GroupFields>(association);
-                groupField.StateId = groupLga.State.ReferenceId.ToString();
-                groupField.LGAId = groupLga.ReferenceId.ToString();
-                groupField.GroupExcoInformations = _mapper.Map<List<ExcoInformation>>(association.Beneficiaries);
-                foreach (var exco in groupField.GroupExcoInformations)
+                foreach (var association in associations)
                 {
-                    var excoLga = await _db.LocalGovernmentAreas.Include(x => x.State).AsNoTracking().FirstOrDefaultAsync(x => x.LocalGovernmentAreaId.Equals(exco.LGAId));
-                    exco.LGAId = excoLga.ReferenceId;
-                    exco.StateId = excoLga.State.ReferenceId;
-                }
-                var groupDoc = association.Documents.FirstOrDefault(x => x.FileType.Equals("mou"));
-                groupDoc.File = AzureHelper.FromAzureToBase64(groupDoc.File);
-                groupField.Documents = new DocumentVm[] { groupDoc };
 
-                var groupTrades = association.TradeType.Split(',');
-                groupField.GroupTradeTypes = new List<int>();
-                foreach (var item in groupTrades)
-                {
-                    groupField.GroupTradeTypes.Add(int.Parse(item));
-                }
+                    var groupLga = await _db.LocalGovernmentAreas.Include(x => x.State).AsNoTracking().FirstOrDefaultAsync(x => x.LocalGovernmentAreaId.Equals(association.LocalGovernmentAreaId));
+                    var groupField = _mapper.Map<GroupFields>(association);
+                    groupField.StateId = groupLga.State.ReferenceId.ToString();
+                    groupField.LGAId = groupLga.ReferenceId.ToString();
 
-                groupField.EnumeratorIds = new List<int> { int.Parse(association.EnumeratorId) };
-
-                var response = await BOIHelper.PusheToWhiteList(groupField);
-                if (response.IsSuccessStatusCode)
-                {
-                    totalRecordPushed = totalRecordPushed + 1;
-                    var json = await response.Content.ReadAsStringAsync();
-                    JObject jobj = JObject.Parse(json);
-                    association.PushedToWhiteList = true;
-                    association.DateUpdated = DateTime.UtcNow;
-
-                    if (jobj["status"].ToString() == "200")
+                    groupField.GroupExcoInformations = _mapper.Map<List<ExcoInformation>>(association.Beneficiaries);
+                    foreach (var exco in groupField.GroupExcoInformations)
                     {
-                        approvedRecords = approvedRecords + 1;
-                        association.IsApprovedByWhiteList = true;
-                        association.ReferenceKey = jobj["data"]["id"].ToString();
-
+                        var excoLga = await _db.LocalGovernmentAreas.Include(x => x.State).AsNoTracking().FirstOrDefaultAsync(x => x.LocalGovernmentAreaId.Equals(exco.LGAId));
+                        exco.LGAId = excoLga.ReferenceId;
+                        exco.StateId = excoLga.State.ReferenceId;
                     }
-                    else if (jobj["status"].ToString() == "401")
-                    {
-                        rejectedRecords = rejectedRecords + 1;
-                        association.RejectionReason = "Rejected by whitelist for these reasons:" + " " + jobj["message"].ToString();
-                    }
-                    else
-                    {
+                    var groupDoc = association.Documents.FirstOrDefault(x => x.FileType.Equals("mou"));
+                    groupDoc.File = AzureHelper.FromAzureToBase64(groupDoc.File);
+                    groupField.Documents = new DocumentVm[] { groupDoc };
 
-                        if (jobj["data"] == null || jobj["data"]["id"] == null)
+                    var groupTrades = association.TradeType.Split(',');
+                    groupField.GroupTradeTypes = new List<int>();
+                    foreach (var item in groupTrades)
+                    {
+                        groupField.GroupTradeTypes.Add(int.Parse(item));
+                    }
+
+                    groupField.EnumeratorIds = new List<int> { int.Parse(association.EnumeratorId) };
+
+                    var response = await BOIHelper.PusheToWhiteList(groupField);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        totalRecordPushed = totalRecordPushed + 1;
+                        var json = await response.Content.ReadAsStringAsync();
+                        JObject jobj = JObject.Parse(json);
+                        association.PushedToWhiteList = true;
+
+                        if (jobj["status"].ToString() == "200")
                         {
+                            approvedRecords = approvedRecords + 1;
+                            association.IsApprovedByWhiteList = true;
+                            association.ReferenceKey = jobj["data"]["id"].ToString();
+
+                        }
+                        else if (jobj["status"].ToString() == "401")
+                        {
+                            rejectedRecords = rejectedRecords + 1;
                             association.RejectionReason = "Rejected by whitelist for these reasons:" + " " + jobj["message"].ToString();
+                        }
+                        else
+                        {
+
+                            if (jobj["data"] == null || jobj["data"]["id"] == null)
+                            {
+                                association.RejectionReason = "Rejected by whitelist for these reasons:" + " " + jobj["message"].ToString();
+
+                            }
+                        }
+                        association.DateUpdated = DateTime.UtcNow;
+                        association.Agent = null;
+                        association.Documents = null;
+                        association.Beneficiaries = null;
+
+                        var updatePortalVm = _mapper.Map<UpdateRecordOnPortalModel>(association);
+                        var updateOnPortalResponse = await BOIHelper.UpdateRecordOnPortal(updatePortalVm);
+                        var portalResponseJson = await updateOnPortalResponse.Content.ReadAsStringAsync();
+                        if (!string.IsNullOrEmpty(portalResponseJson))
+                        {
+                            var portalResponseModel = JsonConvert.DeserializeObject<PortalResponseVm>(portalResponseJson);
+                            if (portalResponseModel.Data)
+                            {
+                                association.IsUpdatedOnPortal = true;
+                            }
+                            await _assoQuery.AddOrUpdate(association);
+                        }
+                        else
+                        {
+                            await _assoQuery.AddOrUpdate(association);
 
                         }
                     }
-                    association.Agent = null;
-                    association.Documents = null;
-                    association.Beneficiaries = null;
-                    await _assoQuery.AddOrUpdate(association);
-                    var updatePortalVm = _mapper.Map<UpdateRecordOnPortalModel>(association);
-                    var updateOnPortalResponse = await BOIHelper.UpdateRecordOnPortal(updatePortalVm);
-                    var portalResponseJson = await updateOnPortalResponse.Content.ReadAsStringAsync();
-                    var portalResponseModel = JsonConvert.DeserializeObject<PortalResponseVm>(portalResponseJson);
-                    if (portalResponseModel.Data)
-                    {
-                        association.IsUpdatedOnPortal = true;
-                        await _assoQuery.AddOrUpdate(association);
 
-                    }
                 }
             }
-            await _emailService.SendEmailAsync(_userContext.GetUserEmail(), "Pushed Records Summary",
-                                           $"Summary of the records pushed to the whitelist is as follows.<br/>" +
-                                           $"Total pushed records: {totalRecordPushed}.<br/>" +
-                                           $"Approved records: {approvedRecords}.<br/>" +
-                                           $"Rejected records: {rejectedRecords}.<br/>");
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+            await _emailService.SendEmailAsync(userEmail, "Pushed Records Summary",
+                                                   $"Summary of the records pushed to the whitelist is as follows.<br/>" +
+                                                   $"Total pushed records: {totalRecordPushed}.<br/>" +
+                                                   $"Approved records: {approvedRecords}.<br/>" +
+                                                   $"Rejected records: {rejectedRecords}.<br/>");
         }
 
-        public async Task PushBeneficiaryRecordsToWhiteList()
+        public async Task PushBeneficiaryRecordsToWhiteList(string userEmail)
         {
             var beneficiaries = _mapper.Map<List<BeneficiaryVm>>(await _db.Beneficiaries
                                                                             .Include(x => x.Agent)
@@ -237,73 +254,88 @@ namespace Geep.DataAccess.CommandQuery
             int totalRecordPushed = 0;
             int approvedRecords = 0;
             int rejectedRecords = 0;
-            foreach (var beneficiary in beneficiaries)
+            try
             {
-
-                var boiField = _mapper.Map<BOIFields>(beneficiary);
-                var clusterLocation = await _clusterQuery.GetById(beneficiary.ClusterLocationId);
-                boiField.StateId = clusterLocation.State.ReferenceId;
-
-                boiField.ClusterLocationId = clusterLocation.ReferenceId;
-
-                if (!string.IsNullOrEmpty(beneficiary.Picture))
-                    boiField.Picture = "data:image/jpeg;base64," + AzureHelper.FromAzureToBase64(beneficiary.Picture);
-
-                if (!string.IsNullOrEmpty(beneficiary.FacialPicture))
-                    boiField.FacialPicture = "data:image/jpeg;base64," + AzureHelper.FromAzureToBase64(beneficiary.FacialPicture);
-
-                boiField.Agent = new AgentVm[] { beneficiary.Agent };
-
-                boiField.AggregatorId = "1";
-
-                var response = await BOIHelper.PusheToWhiteList(boiField);
-                if (response.IsSuccessStatusCode)
+                foreach (var beneficiary in beneficiaries)
                 {
-                    totalRecordPushed = totalRecordPushed + 1;
-                    var json = await response.Content.ReadAsStringAsync();
-                    JObject jobj = JObject.Parse(json);
-                    beneficiary.PushedToWhiteList = true;
-                    beneficiary.DateUpdated = DateTime.UtcNow;
 
-                    if (jobj["status"].ToString() == "200")
-                    {
-                        beneficiary.IsApprovedByWhiteList = true;
-                        beneficiary.ReferenceKey = jobj["data"]["id"].ToString();
-                        approvedRecords = approvedRecords + 1;
+                    var boiField = _mapper.Map<BOIFields>(beneficiary);
+                    var clusterLocation = await _clusterQuery.GetById(beneficiary.ClusterLocationId);
+                    boiField.StateId = clusterLocation.State.ReferenceId;
 
-                    }
-                    else if (jobj["status"].ToString() == "401")
-                    {
-                        beneficiary.RejectionReason = "Rejected by whitelist for these reasons:" + " " + jobj["message"].ToString();
-                        rejectedRecords = rejectedRecords + 1;
-                    }
-                    else
-                    {
+                    boiField.ClusterLocationId = clusterLocation.ReferenceId;
 
-                        if (jobj["data"] == null || jobj["data"]["id"] == null)
+                    if (!string.IsNullOrEmpty(beneficiary.Picture))
+                        boiField.Picture = "data:image/jpeg;base64," + AzureHelper.FromAzureToBase64(beneficiary.Picture);
+
+                    if (!string.IsNullOrEmpty(beneficiary.FacialPicture))
+                        boiField.FacialPicture = "data:image/jpeg;base64," + AzureHelper.FromAzureToBase64(beneficiary.FacialPicture);
+
+                    boiField.Agent = new AgentVm[] { beneficiary.Agent };
+
+                    boiField.AggregatorId = "1";
+
+                    var response = await BOIHelper.PusheToWhiteList(boiField);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        totalRecordPushed = totalRecordPushed + 1;
+                        var json = await response.Content.ReadAsStringAsync();
+                        JObject jobj = JObject.Parse(json);
+                        beneficiary.PushedToWhiteList = true;
+
+                        if (jobj["status"].ToString() == "200")
+                        {
+                            beneficiary.IsApprovedByWhiteList = true;
+                            beneficiary.ReferenceKey = jobj["data"]["id"].ToString();
+                            approvedRecords = approvedRecords + 1;
+
+                        }
+                        else if (jobj["status"].ToString() == "401")
                         {
                             beneficiary.RejectionReason = "Rejected by whitelist for these reasons:" + " " + jobj["message"].ToString();
-
                             rejectedRecords = rejectedRecords + 1;
                         }
-                    }
-                    beneficiary.Agent = null;
-                    beneficiary.ClusterLocationVm = null;
-                    beneficiary.Association = null;
-                    await _beneficiaryQuery.AddOrUpdate(beneficiary);
-                    var updatePortalVm = _mapper.Map<UpdateRecordOnPortalModel>(beneficiary);
-                    var updateOnPortalResponse = await BOIHelper.UpdateRecordOnPortal(updatePortalVm);
-                    var portalResponseJson = await updateOnPortalResponse.Content.ReadAsStringAsync();
-                    var portalResponseModel = JsonConvert.DeserializeObject<PortalResponseVm>(portalResponseJson);
-                    if (portalResponseModel.Data)
-                    {
-                        beneficiary.IsUpdatedOnPortal = true;
-                        await _beneficiaryQuery.AddOrUpdate(beneficiary);
+                        else
+                        {
 
+                            if (jobj["data"] == null || jobj["data"]["id"] == null)
+                            {
+                                beneficiary.RejectionReason = "Rejected by whitelist for these reasons:" + " " + jobj["message"].ToString();
+
+                                rejectedRecords = rejectedRecords + 1;
+                            }
+                        }
+                        beneficiary.DateUpdated = DateTime.UtcNow;
+                        beneficiary.Agent = null;
+                        beneficiary.ClusterLocationVm = null;
+                        beneficiary.Association = null;
+                        var updatePortalVm = _mapper.Map<UpdateRecordOnPortalModel>(beneficiary);
+                        var updateOnPortalResponse = await BOIHelper.UpdateRecordOnPortal(updatePortalVm);
+                        var portalResponseJson = await updateOnPortalResponse.Content.ReadAsStringAsync();
+                        if (!string.IsNullOrEmpty(portalResponseJson))
+                        {
+                            var portalResponseModel = JsonConvert.DeserializeObject<PortalResponseVm>(portalResponseJson);
+                            if (portalResponseModel.Data)
+                            {
+                                beneficiary.IsUpdatedOnPortal = true;
+                            }
+                            await _beneficiaryQuery.AddOrUpdate(beneficiary);
+                        }
+                        else
+                        {
+                            await _beneficiaryQuery.AddOrUpdate(beneficiary);
+
+                        }
                     }
                 }
+
             }
-            await _emailService.SendEmailAsync(_userContext.GetUserEmail(), "Pushed Records Summary",
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            await _emailService.SendEmailAsync(userEmail, "Pushed Records Summary",
                                            $"Summary of the records pushed to the whitelist is as follows.<br/>" +
                                            $"Total pushed records: {totalRecordPushed}.<br/>" +
                                            $"Approved records: {approvedRecords}.<br/>" +

@@ -1,0 +1,99 @@
+﻿
+@{
+    ViewData["Title"] = "Agent";
+}
+
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Agents</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>List of Agents</h4>
+                    </div>
+                </div>
+                <br />
+                <br />
+
+                <div class="table-responsive">
+                    <table id="Jdatatable" class="table">
+                        <thead>
+                            <tr>
+                                <th>Agent Id</th>
+                                <th>Name</th>
+                                <th>Phone Number</th>
+                                <th>Email</th>
+                                <th>Gender</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.oTable = $('#Jdatatable').DataTable({
+            destroy: true,
+            "processing": true,
+            "ajax": {
+                "url": "/Agents/GetIndex",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": "agent_id", "autoWidth": true },
+                { "data": "AgentFullName", "autoWidth": true },
+                { "data": "agent_phone", "autoWidth": true },
+                { "data": "agent_email", "autoWidth": true },
+                { "data": "agent_gender", "autoWidth": true },
+                {
+                    "data": "AgentId",
+                    "autoWidth": true,
+                    "render": function (data) {
+                        return '<a href="#" onclick="AgentRecord(' + data + ')"><i><u><small>Records</small></u></i></a>&nbsp;&nbsp;' +
+                            '<a href="#" onclick="Edit(' + data + ')"><i class="text-info"><u><small>Edit</small></u></i></a>&nbsp;&nbsp;';
+                    }
+                }
+
+            ]
+        });
+    });
+
+    function AddNew() {
+        var url = "/Agents/Save?id=0";
+        $('#myModalDivBody').load(url,
+            function () {
+                $('#actionsList').modal('show');
+            });
+    };
+
+    function Edit(agentId) {
+        var url = "/Agents/Save?id=" + agentId;
+        $('#myModalDivBody').load(url,
+            function () {
+                $('#actionsList').modal('show');
+            });
+    };
+
+    function AgentRecord(agentId) {
+        var url = "/Beneficiaries/AgentRecords?id=" + agentId;
+        window.open(url, '_blank');
+
+    }
+
+</script>

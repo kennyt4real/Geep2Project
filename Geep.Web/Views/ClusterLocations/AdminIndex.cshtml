@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="AdminDashboard">DashBoard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Cluster Locations</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <h4>List of Clusters</h4>
+                        <br />
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="Jdatatable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Reference ID</th>
+                                <th>Name</th>
+                                <th>State Name</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.oTable = $('#Jdatatable').DataTable({
+            destroy: true,
+            "processing": true,
+            "ajax": {
+                "url": "/ClusterLocations/GetIndex",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": "ReferenceId", "autoWidth": true },
+                { "data": "Name", "autoWidth": true },
+                { "data": "StateName", "autoWidth": true }
+            ]
+        });
+    });
+
+</script>

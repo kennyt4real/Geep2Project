@@ -12,6 +12,7 @@ using Geep.ViewModels.CoreVm;
 using static Geep.ViewModels.Constants.PopUp;
 using Microsoft.AspNetCore.Authorization;
 using Geep.DomainLayer.CustomAbstrations;
+using Hangfire;
 
 namespace Geep.Web.Controllers
 {
@@ -20,14 +21,19 @@ namespace Geep.Web.Controllers
     public class AssociationsController : Controller
     {
         private ICrudInteger<AssociationVm> _repo;
+        private IBackgroundJobClient _background;
         private ICrudInteger<StateVm> _stateQuery;
         private IEntitiesManagement _beneficiaryQuery;
+        private IUserContext _userContext;
 
-        public AssociationsController(ICrudInteger<AssociationVm> repo, ICrudInteger<StateVm> stateQuery, IEntitiesManagement beneficiaryQuery)
+        public AssociationsController(ICrudInteger<AssociationVm> repo, ICrudInteger<StateVm> stateQuery, IUserContext userContext,
+            IEntitiesManagement beneficiaryQuery, IBackgroundJobClient background)
         {
             _repo = repo;
+            _background = background;
             _stateQuery = stateQuery;
             _beneficiaryQuery = beneficiaryQuery;
+            _userContext = userContext;
         }
 
         public IActionResult Index()
@@ -44,8 +50,10 @@ namespace Geep.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> PushGroupsToWhiteList()
         {
-            await _beneficiaryQuery.CreateGroupOnWhiteList();
-            return Json(new { status = true, message = "Pushing Records to WhiteList in progress...Will notify you via a mail at the end of the task!!!" });
+            var user = _userContext.GetUserEmail();
+            _background.Enqueue(() => _beneficiaryQuery.CreateGroupOnWhiteList(user));
+            //await _beneficiaryQuery.CreateGroupOnWhiteList();
+            return Json(new { status = true, message = "Pushing Records to WhiteList in progress...Will notify you via a mail at the end of the process!!!" });
         }
 
         public async Task<IActionResult> Save(int id)

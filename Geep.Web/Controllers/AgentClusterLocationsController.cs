@@ -43,6 +43,15 @@ namespace Geep.Web.Controllers
             ViewData["AgentId"] = new MultiSelectList(agents, "AgentId", "Email");
             return View();
         }
+        public async Task<IActionResult> AdminIndex()
+        {
+            var agents = await _entitiesManagement.GetGeepAgents();
+
+
+            ViewData["StateId"] = new SelectList(await _stateQuery.GetAll(), "StateId", "StateName");
+            ViewData["AgentId"] = new MultiSelectList(agents, "AgentId", "Email");
+            return View();
+        }
 
         public async Task<IActionResult> GetIndex()
         {

@@ -43,6 +43,12 @@ namespace Geep.Web.Controllers
             var data = await _repo.GetAll();
             return Json(new { data });
         }
+        public async Task<IActionResult> AdminIndex()
+        {
+            ViewData["StateId"] = new SelectList(await _stateQuery.GetAll(), "StateId", "StateName");
+
+            return View();
+        }
 
         public async Task<IActionResult> Save(int id)
         {

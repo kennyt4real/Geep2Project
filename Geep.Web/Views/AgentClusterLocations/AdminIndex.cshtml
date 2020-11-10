@@ -73,7 +73,6 @@
                                 <th>Agent Name</th>
                                 <th>Cluster Name</th>
                                 <th>State Name</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                     </table>
@@ -100,14 +99,7 @@
                 { "data": "AgentEmail", "autoWidth": true },
                 { "data": "AgentName", "autoWidth": true },
                 { "data": "ClusterName", "autoWidth": true },
-                { "data": "ClusterStateName", "autoWidth": true },
-                {
-                    "data": "AgentClusterLocationId",
-                    "autoWidth": true,
-                    "render": function (data) {
-                        return '<a href="#" onclick="Delete(' + data + ')"><i class="text-danger"><u><small >Delete</small></u></i></a>';
-                    }
-                }
+                { "data": "ClusterStateName", "autoWidth": true }
             ]
         });
     });
@@ -125,33 +117,6 @@
         $('#myModalDivBody').load(url,
             function () {
                 $('#actionsList').modal('show');
-            });
-    };
-
-    function Delete(agentClusterLocationId) {
-        swal({
-            title: "Are you sure to remove this Agent ClusterLocation?",
-            text: "Once deleted, you will not be able to use this Agent ClusterLocation again!",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        })
-            .then((willDelete) => {
-                if (willDelete) {
-                    $.ajax({
-                        type: "POST",
-                        url: "/AgentClusterLocations/Delete?id=" + agentClusterLocationId,
-                        "datatype": "json",
-                        success: function (data) {
-                            window.oTable.ajax.reload(); //run my_fun() ondomready
-                            toastr.success(data.message);
-                            swal(data.message);
-                        }
-                    });
-
-                } else {
-                    swal("Its Ok you canceled, This Agent ClusterLocation is safe!");
-                }
             });
     };
 

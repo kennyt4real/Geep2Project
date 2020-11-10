@@ -8,6 +8,7 @@ using Geep.DomainLayer.Mapper;
 using Geep.ViewModels;
 using Geep.ViewModels.CoreVm;
 using Geep.Web.Services;
+using Hangfire;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -74,6 +75,9 @@ namespace Geep.Web
                 //c.SchemaFilter<SchemaFilter>();
                 //c.OperationFilter<HeaderFilter>();
             });
+
+            // Add the processing server as IHostedService
+            services.AddHangfireServer();
 
             services.AddSwaggerGenNewtonsoftSupport();
 

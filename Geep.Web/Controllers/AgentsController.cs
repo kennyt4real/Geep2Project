@@ -31,6 +31,10 @@ namespace Geep.Web.Controllers
         {
             return View();
         }
+        public IActionResult AdminIndex()
+        {
+            return View();
+        }
 
         public async Task<IActionResult> GetIndex()
         {

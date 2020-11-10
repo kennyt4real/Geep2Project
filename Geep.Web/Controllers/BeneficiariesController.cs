@@ -12,11 +12,12 @@ using Geep.DomainLayer.GeneralAbstractions;
 using Geep.DomainLayer.CustomAbstrations;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
+using Hangfire.Processing;
+using Hangfire;
 
 namespace Geep.Web.Controllers
 {
     [Authorize]
-
     public class BeneficiariesController : Controller
     {
         private ICrudInteger<BeneficiaryVm> _repo;
@@ -24,15 +25,19 @@ namespace Geep.Web.Controllers
         private ICrudInteger<AgentVm> _agentQuery;
         private ICrudInteger<AssociationVm> _associationQuery;
         private IMapper _mapper;
+        private IBackgroundJobClient _background;
+        private IUserContext _userContext;
 
-        public BeneficiariesController(ICrudInteger<BeneficiaryVm> repo, IEntitiesManagement beneficiaryQuery, IMapper mapper,
-                                                ICrudInteger<AgentVm> agentQuery, ICrudInteger<AssociationVm> associationQuery)
+        public BeneficiariesController(ICrudInteger<BeneficiaryVm> repo, IEntitiesManagement beneficiaryQuery, IMapper mapper, IBackgroundJobClient background,
+                                                ICrudInteger<AgentVm> agentQuery, ICrudInteger<AssociationVm> associationQuery, IUserContext userContext)
         {
             _repo = repo;
             _beneficiaryQuery = beneficiaryQuery;
             _agentQuery = agentQuery;
             _associationQuery = associationQuery;
             _mapper = mapper;
+            _background = background;
+            _userContext = userContext;
         }
 
         public IActionResult Index()
@@ -82,8 +87,10 @@ namespace Geep.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> PushRecordsToWhiteList()
         {
-            await _beneficiaryQuery.PushBeneficiaryRecordsToWhiteList();
-            return Json(new {status = true, message = "Pushing Records to WhiteList in progress...Will notify you via a mail at the end of the task!!!" });
+            var user = _userContext.GetUserEmail();
+            _background.Enqueue(() => _beneficiaryQuery.CreateGroupOnWhiteList(user));
+            //await _beneficiaryQuery.PushBeneficiaryRecordsToWhiteList();
+            return Json(new {status = true, message = "Pushing Records to WhiteList in progress...Will notify you via a mail at the end of the process!!!" });
         }
 
         public async Task<IActionResult> Save(int id)

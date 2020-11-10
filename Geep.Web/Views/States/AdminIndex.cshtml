@@ -1,0 +1,75 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="AdminDashboard">DashBoard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">States</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>List of States</h4>
+                    </div>
+                </div>
+                <br />
+                <br />
+
+                <div class="table-responsive">
+                    <table id="Jdatatable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Reference ID</th>
+                                <th>State Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.oTable = $('#Jdatatable').DataTable({
+            destroy: true,
+            "processing": true,
+            "ajax": {
+                "url": "/States/GetIndex",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+                { "data": "ReferenceId", "autoWidth": true },
+                { "data": "StateName", "autoWidth": true },
+                {
+                    "data": "StateId",
+                    "autoWidth": true,
+                    "render": function (data) {
+                        return '<a href="#" onclick="LocalGovt(' + data + ')"><i><u><small>Local Governments</small></u></i></a>&nbsp;&nbsp;';
+                    }
+                }
+
+            ]
+        });
+    });
+
+    function LocalGovt(stateId) {
+        var url = "/LocalGovernmentAreas/Index?id=" + stateId;
+        window.open(url, '_blank');
+    } 
+
+</script>

@@ -26,7 +26,7 @@ namespace Geep.Models.Core
         public string LeaderName { get; set; }
         public string LeaderPhoneNumber { get; set; }
         public LocalGovernmentArea LocalGovernmentArea { get; set; }
-        public List<Document> Document { get; set; }
+        public ICollection<Document> Documents { get; set; }
         public ICollection<Beneficiary> Beneficiaries { get; set; }
         public bool PushedToWhiteList { get; set; }
         public bool IsApprovedByWhiteList { get; set; }

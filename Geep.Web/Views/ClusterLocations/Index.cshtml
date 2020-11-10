@@ -41,10 +41,6 @@
                             </select>
                             <span asp-validation-for="StateId" class="text-danger"></span>
                         </div>
-
-
-
-
                         <div class="col-md-12  text-md-center">
                             <input type="submit" value="ADD STATE" class="text-uppercase btn btn-rounded mb-5 btn-info" />
 
@@ -64,21 +60,14 @@
                         <h4>List of Clusters</h4>
                         <br />
                     </div>
-                    @*<div class="col-md-6 text-right">
-                            <a href="#" onclick="AddNew()" class="btn btn-primary">ADD NEW CLUSTER</a>
-                        </div>*@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        @*<div class="col-md-6 text-right">
-                                <a href="#" onclick="UploadClusterLocations()" class="btn btn-primary">UPLOAD CLUSTER LOCATION</a>
-                            </div>*@
                         <form asp-controller="ClusterLocations" asp-action="UploadClusterLocations" method="post" enctype="multipart/form-data" id="excelform">
                             <div class="container">
                                 <div class="row">
                                     <div class="col-md-9">
                                         <span>Upload Cluster Locations</span>
-                                        @*<input type="file" id="fileupload" name="files" class="form-control" />*@
                                         <input type="file" id="fileUpload" name="excelfile" />
 
                                     </div>
@@ -86,29 +75,8 @@
                                         <input id="btnsubmitExcel" type="submit" value="Upload" class="btn btn-primary" />
                                     </div>
                                 </div>
-                                @*<div class="clearfix">&nbsp;</div>
-                                    <div class="row">
-                                        <div id="divPrint"></div>
-                                    </div>*@
                             </div>
                         </form>
-                        @*<form asp-controller="ClusterLocations" asp-action="UploadClusterLocations" method="post" enctype="multipart/form-data" id="excelform">
-                            <span>Upload Clusters Excel File </span>
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-md-10">
-                                        <input type="file" name="excelfile" />
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <input id="btnsubmitExcel" type="submit" value="Upload" class="btn btn-xs btn-primary" />
-                                </div>
-                            </div>*@
-                        @*<br />
-                            <br />
-
-                                            </form>*@
-
                     </div>
                 </div>
                 <br />
@@ -169,13 +137,6 @@
             });
     };
 
-    //function LocalGovt(stateId) {
-    //    var url = "/LocalGovernmentAreas/Index?id=" + stateId;
-    //    window.open(url, '_blank');
-
-    //}
-
-
     function Edit(stateId) {
         var url = "/ClusterLocations/Save?id=" + stateId;
         $('#myModalDivBody').load(url,
@@ -233,14 +194,7 @@
             processData: false
         });
     });
-
-    //function UploadClusterLocations() {
-    //    var url = "/ClusterLocations/UploadClusterLocations";
-    //    $('#myModalDivBody').load(url,
-    //        function () {
-    //            $('#actionsList').modal('show');
-    //        });
-    //};
+   
     $(function () {
         $('#excelform').submit(function () {
             $("input[type='submit']", this)
@@ -249,49 +203,4 @@
             return true;
         });
     });
-    //$(function () {
-    //    $('#btnsubmitExcel').on('click', function () {
-    //        var fileExtension = ['xls', 'xlsx'];
-    //        var filename = $('#fileupload').val();
-    //        if (filename.length == 0) {
-    //            alert("Please select a file.");
-    //            return false;
-    //        }
-    //        else {
-    //            var extension = filename.replace(/^.*\./, '');
-    //            if ($.inArray(extension, fileExtension) == -1) {
-    //                alert("Please select only excel files.");
-    //                return false;
-    //            }
-    //        }
-    //    });
-
-    //        var fdata = new FormData();
-    //        var fileUpload = $("#fileupload").get(0);
-    //        var files = fileUpload.files;
-    //        fdata.append(files[0].name, files[0]);
-    //        $.ajax({
-    //            type: "POST",
-    //            url: "/ClusterLocations/Save",
-    //            beforeSend: function (xhr) {
-    //                xhr.setRequestHeader("XSRF-TOKEN",
-    //                    $('input:hidden[name="__RequestVerificationToken"]').val());
-    //            },
-    //            data: fdata,
-    //            contentType: false,
-    //            processData: false,
-    //            success: function (response) {
-    //                if (response.length == 0)
-    //                    alert('Some error occured while uploading');
-    //                else {
-    //                    $('#divPrint').html(response);
-    //                }
-    //            },
-    //            error: function (e) {
-    //                $('#divPrint').html(e.responseText);
-    //            }
-    //        });
-    //    })
-
-
 </script>

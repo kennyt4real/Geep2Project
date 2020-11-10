@@ -97,6 +97,7 @@ namespace Geep.Web.Controllers.ApiController
                                 var clusterLocation = await _clusterQuery.GetByReferenceId(beneficiary.ClusterLocationId);
                                 beneficiary.ClusterLocationId = clusterLocation.ClusterLocationId;
                                 beneficiary.AgentId = agent.AgentId;
+                                beneficiary.AssociationId = associationId;
                                 beneficiary.Agent = null;
 
                                 //Check if Beneficiary already exist.

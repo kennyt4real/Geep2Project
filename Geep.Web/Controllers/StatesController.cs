@@ -34,6 +34,10 @@ namespace Geep.Web.Controllers
             var data = await _repo.GetAll();
             return Json(new { data });
         }
+        public IActionResult AdminIndex()
+        {
+            return View();
+        }
 
         public async Task<IActionResult> Save(int id)
         {
